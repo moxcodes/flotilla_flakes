@@ -17,7 +17,7 @@
       side-by-side = true;
     };
     extraConfig = {
-      defaultBranch = "main";
+      init.defaultBranch = "main";
     };
   };
 
