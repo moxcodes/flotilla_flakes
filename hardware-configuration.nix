@@ -19,11 +19,6 @@
       options = [ "subvol=@" ];
     };
 
-  # fileSystems."/bin" =
-  #   { device = "/dev/disk/by-uuid/108943fb-fc72-437a-a027-d39373072c93";
-  #     fsType = "btrfs";
-  #   };
-
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/DE45-D1BE";
       fsType = "vfat";
@@ -39,10 +34,10 @@
       fsType = "ext4";
     };
 
-  # fileSystems."/usr" =
-  #   { device = "/dev/disk/by-uuid/bc1e9cfe-5261-4ea6-8e36-e142122853bb";
-  #     fsType = "btrfs";
-  #   };
+  fileSystems."/fast" =
+    { device = "/dev/disk/by-uuid/4a59313a-133c-444f-8ff7-3fd771377ada";
+      fsType = "ext4";
+    };
 
   swapDevices = [ ];
 
