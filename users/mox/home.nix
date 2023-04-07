@@ -53,6 +53,34 @@
     enable = true;
   };
 
+  programs.tmux = {
+    enable = true;
+    prefix = "C-z";
+    shortcut = "z";
+    terminal = "tmux-256color";
+    sensibleOnTop = true;
+    historyLimit = 50000;
+    # Note: redundant continuum load needed because it must be the last thing
+    # loaded after other things change the right status
+    extraConfig = ''
+      run-shell ${pkgs.tmuxPlugins.continuum.outPath}/share/tmux-plugins/continuum/continuum.tmux
+    '';
+    plugins = with pkgs; [
+      {
+        plugin = tmuxPlugins.resurrect;
+        extraConfig = ''
+          set -g @resurrect-capture-pane-contents 'on'
+          set -g @resurrect-processes '"~ssh->ssh *" "~emacs->emacs *" "~emacsclient->emacsclient *" "~watch->watch *" "~man->man *"'
+        '';
+      }
+      {
+        plugin = tmuxPlugins.continuum;
+        extraConfig = ''
+          set -g @continuum-save-interval '1'
+        '';
+      }
+    ];
+  };
 
   programs.zathura = {
     enable = true;
@@ -122,4 +150,24 @@
     ];
   };
 
+  # because the auto-generated service for tmux-continuum isn't good enough to
+  # handle the nix symlink jungle... and is borked in other ways too...
+  systemd.user.services = {
+    tmux_continuum = {
+      Unit = {
+        Description = "tmux default session (detached)";
+        Documentation = [ "man:tmux(1)" ];
+        # lists are duplicate keys
+        After = [ "emacs.service" "syncthing.service" ];
+      };
+      Service = {
+        ExecStart="${pkgs.tmux.outPath}/bin/tmux new-session -d ${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/restore.sh";
+        ExecStop="${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/save.sh";
+        Restart="on-failure";
+        SuccessExitStatus="15";
+        Type="forking";
+      };
+      Install.WantedBy=[ "default.target" ];
+    };
+  };
 }
