@@ -21,7 +21,7 @@
   # Symlink /fast/mox/... to the home directory
   # To add/remove, alter the argument attribute set
   # TODO: make this conditional on an attribute so
-  # that home.nix is more portable.       
+  # that home.nix is more portable.
   home.file = (builtins.mapAttrs
    (name: dir: {
       source =
@@ -168,6 +168,78 @@
         Type="forking";
       };
       Install.WantedBy=[ "default.target" ];
+    };
+  };
+
+  xdg = {
+    enable = true;
+    desktopEntries = {
+      emacs-nw = {
+        name = "Emacs Terminal";
+        genericName = "Text Editor";
+        exec = "emacsclient -nw %U";
+        terminal = true;
+        categories = [ "Application" "IDE" "TextTools" ];
+        mimeType = [ "text/english" "text/plain" "text/x-makefile"
+                     "text/x-c++hdr" "text/x-c++src" "text/x-chdr" "text/x-csrc"
+                     "text/x-java" "text/x-moc" "text/x-pascal" "text/x-tcl"
+                     "text/x-tex" "application/x-shellscript" "text/x-c"
+                     "text/x-c++"];
+      };
+    };
+    mimeApps.enable = true;
+    mimeApps.defaultApplications = {
+      "application/pdf" = "org.pwmt.zathura.desktop";
+      "application/postscript" = "org.pwmt.zathura.desktop";
+      "application/x-shellscript" = "emacs-nw.desktop";
+      "image/bmp" = "feh.desktop";
+      "image/vnd.djvu" = "org.pwmt.zathura.desktop";
+      "image/jpeg" = "feh.desktop";
+      "text/english" = "emacs-nw.desktop";
+      "text/plain" = "emacs-nw.desktop";
+      "text/x-asm" = "emacs-nw.desktop";
+      "text/x-makefile" = "emacs-nw.desktop";
+      "text/x-c++hdr" = "emacs-nw.desktop";
+      "text/x-c++src" = "emacs-nw.desktop";
+      "text/x-chdr" = "emacs-nw.desktop";
+      "text/x-csrc" = "emacs-nw.desktop";
+      "text/x-java" = "emacs-nw.desktop";
+      "text/x-moc" = "emacs-nw.desktop";
+      "text/x-pascal" = "emacs-nw.desktop";
+      "text/x-tcl" = "emacs-nw.desktop";
+      "text/x-tex" = "emacs-nw.desktop";
+      "text/x-c" = "emacs-nw.desktop";
+      "text/x-c++" = "emacs-nw.desktop";
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "x-scheme-handler/ftp" = "firefox.desktop";
+      "x-scheme-handler/chrome" = "firefox.desktop";
+    };
+    mimeApps.associations.added = {
+      "application/pdf" = "org.pwmt.zathura.desktop";
+      "application/postscript" = "org.pwmt.zathura.desktop";
+      "image/bmp" = "feh.desktop";
+      "image/vnd.djvu" = "org.pwmt.zathura.desktop";
+      "image/jpeg" = "feh.desktop";
+      "text/english" = "emacs-nw.desktop";
+      "text/plain" = "emacs-nw.desktop";
+      "text/x-asm" = "emacs-nw.desktop";
+      "text/x-makefile" = "emacs-nw.desktop";
+      "text/x-c++hdr" = "emacs-nw.desktop";
+      "text/x-c++src" = "emacs-nw.desktop";
+      "text/x-chdr" = "emacs-nw.desktop";
+      "text/x-csrc" = "emacs-nw.desktop";
+      "text/x-java" = "emacs-nw.desktop";
+      "text/x-moc" = "emacs-nw.desktop";
+      "text/x-pascal" = "emacs-nw.desktop";
+      "text/x-tcl" = "emacs-nw.desktop";
+      "text/x-tex" = "emacs-nw.desktop";
+      "text/x-c" = "emacs-nw.desktop";
+      "text/x-c++" = "emacs-nw.desktop";
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "x-scheme-handler/ftp" = "firefox.desktop";
+      "x-scheme-handler/chrome" = "firefox.desktop";
     };
   };
 }
