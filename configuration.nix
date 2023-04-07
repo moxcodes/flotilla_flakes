@@ -125,11 +125,6 @@
 
   # List services that you want to enable:
 
-  services.emacs = {
-    enable = true;
-    package = pkgs.emacs;
-  };
-
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 

@@ -52,6 +52,8 @@
   programs.emacs = {
     enable = true;
   };
+
+  services.emacs.enable = true;
   services.syncthing = {
     enable = true;
     extraOptions = [
