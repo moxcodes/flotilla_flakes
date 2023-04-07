@@ -45,6 +45,11 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.opengl.enable = true;
+  hardware.opengl.driSupport32Bit = true;
+
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
   # Enable the XFCE Desktop Environment.
   services.xserver.displayManager.lightdm.enable = true;
