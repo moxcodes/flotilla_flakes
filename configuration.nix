@@ -94,11 +94,7 @@
     isNormalUser = true;
     description = "Jordan Moxon";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      firefox
-      fish
-    #  thunderbird
-    ];
+    shell = pkgs.fish;
   };
 
   nix.package = pkgs.nixUnstable;
@@ -110,18 +106,15 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    dmenu
     emacs
+    fish
     git
-    kitty
-    tmux
-    xcompmgr
-    xmonad-with-packages
     wget
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
 
+  programs.fish.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;

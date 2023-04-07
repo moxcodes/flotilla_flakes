@@ -1,4 +1,18 @@
-{
+{config, pkgs, ...}: {
+  home.packages = with pkgs; [
+    dmenu
+    feh
+    firefox
+    kitty
+    mplayer
+    steam
+    syncthing
+    tmux
+    xcompmgr
+    xmonad-with-packages
+    zathura
+  ];
+
   home.username = "mox";
   home.homeDirectory = "/home/mox";
   home.stateVersion = "22.11";
