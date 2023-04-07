@@ -127,13 +127,14 @@
 
   # List services that you want to enable:
 
+  # Works for users that do not use home-manager
   systemd.user.services.emacs-daemon = {
     description = "Emacs user Daemon";
     wantedBy = [ "default.target" ];
     serviceConfig = {
       Type = "forking";
-      ExecStart = "${pkgs.emacs}/usr/bin/emacs --daemon";
-      ExecStop = "/usr/bin/emacsclient --eval \"(kill-emacs)\"";
+      ExecStart = "${pkgs.emacs.outPath}/bin/emacs --daemon";
+      ExecStop = "${pkgs.emacs.outPath}/bin/emacsclient --eval \"(kill-emacs)\"";
       Restart = "on-failure";
     };
   };
