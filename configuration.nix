@@ -125,19 +125,10 @@
 
   # List services that you want to enable:
 
-  # Works for users that do not use home-manager
-  systemd.user.services.emacs-daemon = {
-    description = "Emacs user Daemon";
-    wantedBy = [ "default.target" ];
-    serviceConfig = {
-      Type = "forking";
-      ExecStart = "${pkgs.emacs.outPath}/bin/emacs --daemon";
-      ExecStop = "${pkgs.emacs.outPath}/bin/emacsclient --eval \"(kill-emacs)\"";
-      Restart = "on-failure";
-    };
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs;
   };
-
-  systemd.services.emacs-daemon.enable = true;  
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
