@@ -4,6 +4,7 @@
     feh
     firefox
     gitmux
+    gnumake
     nerdfonts
     font-awesome
     kitty
@@ -12,6 +13,7 @@
     steam
     syncthing
     tmux
+    texlive.combined.scheme-full
     xmonad-with-packages
     zathura
   ];
