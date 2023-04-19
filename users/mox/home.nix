@@ -172,6 +172,7 @@
     };
     mimeApps.enable = true;
     mimeApps.defaultApplications = {
+      "application/ogg" = "mplayer.desktop";
       "application/pdf" = "org.pwmt.zathura.desktop";
       "application/postscript" = "org.pwmt.zathura.desktop";
       "application/x-shellscript" = "emacs-nw.desktop";
@@ -193,32 +194,11 @@
       "text/x-tex" = "emacs-nw.desktop";
       "text/x-c" = "emacs-nw.desktop";
       "text/x-c++" = "emacs-nw.desktop";
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "x-scheme-handler/ftp" = "firefox.desktop";
-      "x-scheme-handler/chrome" = "firefox.desktop";
-    };
-    mimeApps.associations.added = {
-      "application/pdf" = "org.pwmt.zathura.desktop";
-      "application/postscript" = "org.pwmt.zathura.desktop";
-      "image/bmp" = "feh.desktop";
-      "image/vnd.djvu" = "org.pwmt.zathura.desktop";
-      "image/jpeg" = "feh.desktop";
-      "text/english" = "emacs-nw.desktop";
-      "text/plain" = "emacs-nw.desktop";
-      "text/x-asm" = "emacs-nw.desktop";
-      "text/x-makefile" = "emacs-nw.desktop";
-      "text/x-c++hdr" = "emacs-nw.desktop";
-      "text/x-c++src" = "emacs-nw.desktop";
-      "text/x-chdr" = "emacs-nw.desktop";
-      "text/x-csrc" = "emacs-nw.desktop";
-      "text/x-java" = "emacs-nw.desktop";
-      "text/x-moc" = "emacs-nw.desktop";
-      "text/x-pascal" = "emacs-nw.desktop";
-      "text/x-tcl" = "emacs-nw.desktop";
-      "text/x-tex" = "emacs-nw.desktop";
-      "text/x-c" = "emacs-nw.desktop";
-      "text/x-c++" = "emacs-nw.desktop";
+      "video/mp4" = "mplayer.desktop";
+      "video/mpeg" = "mplayer.desktop";
+      "video/ogg" = "mplayer.desktop";
+      "video/x-msvideo" = "mplayer.desktop";
+      "video/x-ms-wm" = "mplayer.desktop";
       "x-scheme-handler/http" = "firefox.desktop";
       "x-scheme-handler/https" = "firefox.desktop";
       "x-scheme-handler/ftp" = "firefox.desktop";
