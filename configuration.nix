@@ -15,6 +15,15 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # required for hibernation
+  security.protectKernelImage = false;
+  boot.kernelParams = [ "resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141" ];
+  boot.resumeDevice = "/dev/disk/by-uuid/3778fe96-f599-496a-b760-2c6bf7414141";
+  services.logind.lidSwitch = "hibernate";
+  services.logind.extraConfig = ''
+    HandleLidSwitch=hibernate
+  '';
+
   networking.hostName = "rocinante"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -43,16 +52,31 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd \"sway --unsupported-gpu -d\"";
+      user = "greeter";
+    };
+  };
+
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.opengl.enable = true;
   hardware.opengl.driSupport32Bit = true;
 
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
+  hardware.nvidia.modesetting.enable = true;
+  hardware.nvidia.open = false;
+#  hardware.nvidia.prime.offload.enable = true;
+#  hardware.nvidia.prime.offload.enableOffloadCmd = true;
+  hardware.nvidia.prime.sync.enable = true;
+  hardware.nvidia.prime.nvidiaBusId = "PCI:1:0:0";
+  hardware.nvidia.prime.intelBusId = "PCI:0:2:0";
+  hardware.nvidia.forceFullCompositionPipeline = true;
 
   # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.xfce.enable = true;
 
   # services.xserver.windowManager.xmonad = {
@@ -73,6 +97,7 @@
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
+  security.polkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -93,30 +118,53 @@
   users.users.mox = {
     isNormalUser = true;
     description = "Jordan Moxon";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "docker" "networkmanager" "video" "wheel" ];
     shell = pkgs.fish;
   };
 
   nix.package = pkgs.nixUnstable;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.auto-optimise-store = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.cudaSupport = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+  environment.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = "1";
+    MOZ_ENABLE_WAYLAND = "1";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBARARY_NAME="nvidia";
+  };
   environment.systemPackages = with pkgs; [
+    busybox
+    cargo
+    clang
+    docker
     emacs
     fish
     git
+    greetd.tuigreet
+    gparted
     lm_sensors
-    python312
+    lshw
+    (python3.withPackages(ps: with ps; [ pandas ]))
+    pciutils
+    rustc
+    sway
     wget
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+  ];
+
+  fonts.fonts = with pkgs; [
+    inconsolata
+    inconsolata-nerdfont
+    (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
   ];
 
   programs.fish.enable = true;
+  programs.light.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -129,6 +177,7 @@
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
+  virtualisation.docker.enable = true;
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [

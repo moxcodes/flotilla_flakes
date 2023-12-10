@@ -1,21 +1,48 @@
 {config, pkgs, ...}: {
-  home.packages = with pkgs; [
+  home.packages = with pkgs;
+  let
+    diffusers = ps: ps.callPackage ./deriv/diffusers {};
+    python-with-packages = python3.withPackages(ps: with ps; [
+       beautifulsoup4
+       numpy
+       selenium
+#      huggingface-hub torch transformers (diffusers ps)
+    ]);
+  in
+  [
+    awscli2
+    bemenu
+    chromedriver
     dmenu
+    dmidecode
     feh
-    firefox
+    firefox-bin
+    glxinfo
+    gimp
     gitmux
     gnumake
-    nerdfonts
+    inconsolata-nerdfont
+    jq
+    # TODO - try to make this a part of emacs dependencies somehow
+    ispell
     font-awesome
     kitty
+    krita
     mplayer
-    picom
     steam
     syncthing
     tmux
     texlive.combined.scheme-full
+    waybar
+    xdg-utils
+    xf86_input_wacom
     xmonad-with-packages
+    xorg.xev
     zathura
+    zoom-us
+#    python3
+    python-with-packages
+    (callPackage ./deriv/multibg-sway { })
   ];
 
   home.username = "mox";
@@ -56,6 +83,43 @@
 
   programs.emacs = {
     enable = true;
+  };
+
+  # programs.firefox = {
+  #   profiles.mox = {
+  # site: https://addons.mozilla.org/firefox/downloads/latest/<number>
+  # bitwarden: 735894
+  # ublock origin: 607454
+  #   };
+  # };
+
+  programs.kitty = {
+    enable = true;
+    font = {
+      name = "inconsolata";
+      size = 8.0;
+    };
+    settings = {
+      cursor = "#00DD00";
+      scrollback_lines = 5000;
+      repaint_delay = 5;
+      input_delay = 0;
+      sync_to_monitor = "yes";
+      enable_audio_bell = "no";
+      window_border_width = "0.0";
+      draw_minimal_borders = "yes";
+      window_margin_width = "0.0";
+      window_padding_width = 0;
+      background_opacity = "0.7";
+      dynamic_background_opacity = "no";
+      foreground = "#00dd00";
+    };
+    extraConfig = ''
+    symbol_map U+E0A0-U+E0A3,U+E0C0-U+E0C7 PowerlineSymbols
+    symbol_map U+23FB-U+2B58,U+E000-U+EBFF,U+F000-U+FD46,U+F0000-U+F0FFF SymbolsNF
+    map kitty_mod+equal change_font_size all +1.0
+    map kitty_mod+minus change_font_size all -1.0
+    '';
   };
 
   programs.tmux = (import ./programs/tmux.nix {config=config; pkgs=pkgs;});
@@ -119,12 +183,21 @@
     };
   };
 
-  services.emacs.enable = true;
-  services.picom = {
+  programs.waybar = {
     enable = true;
-    package = pkgs.picom;
-    backend = "glx";
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 10;
+        output = [
+          "eDP-1"
+        ];
+      };
+    };
   };
+
+  services.emacs.enable = true;
   services.syncthing = {
     enable = true;
     extraOptions = [
@@ -147,6 +220,9 @@
         ExecStart="${pkgs.tmux.outPath}/bin/tmux new-session -d ${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/restore.sh";
         ExecStop="${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/save.sh";
         Restart="on-failure";
+        RestartSec="5";
+        StartLimitBurst="5";
+        StartLimitIntervalSec="10";
         SuccessExitStatus="15";
         Type="forking";
       };
@@ -204,5 +280,148 @@
       "x-scheme-handler/ftp" = "firefox.desktop";
       "x-scheme-handler/chrome" = "firefox.desktop";
     };
+  };
+  
+  wayland.windowManager.sway = let
+    workspaceSwitchScript = pkgs.writeShellScript "workspace_switch.bash" ''
+      ROWS=3
+      COLUMNS=3
+      # don't move by default
+      MOVE_WINDOW=False
+      DIRECTION=""
+      while getopts ":r::c::d::m" opt; do
+        case $opt in
+           r)
+             ROWS=$OPTARG
+             ;;
+           c)
+             COLUMNS=$OPTARG
+             ;;
+           d)
+             DIRECTION=$OPTARG
+             ;;
+           m)
+             MOVE_WINDOW=True
+             ;;
+           *)
+             echo "invalid command: no parameter included with argument $OPTARG"
+             ;;
+        esac
+      done
+      CURRENT=`${pkgs.sway.outPath}/bin/swaymsg -t get_workspaces | ${pkgs.jq.outPath}/bin/jq '.[] | select(.focused==true) | .num'`
+      COL=$(( ($CURRENT - 1) % $COLUMNS))
+      ROW=$(( ($CURRENT - 1) / $COLUMNS))
+      if [[ $DIRECTION == "up" ]]; then
+        ROW=$(( ($ROW - 1 + $ROWS) % $ROWS ))
+      elif [[ $DIRECTION == "down" ]]; then
+        ROW=$(( ($ROW + 1) % $ROWS ))
+      elif [[ $DIRECTION == "left" ]]; then
+        COL=$(( ($COL - 1 + $COLUMNS) % $COLUMNS ))
+      else
+        COL=$(( ($COL + 1) % $COLUMNS ))
+      fi
+      NEW=$(( $ROW * $COLUMNS + $COL + 1))
+      if [[ $MOVE_WINDOW == True ]]; then
+        ${pkgs.sway.outPath}/bin/swaymsg move container to workspace $NEW
+      fi
+      ${pkgs.sway.outPath}/bin/swaymsg workspace $NEW
+    '';
+  in {
+    enable = true;
+    config = rec {
+      menu = "bemenu-run --fn \"inconsolata\" -p \"▶\" --tf \"#00FF00FF\" --tb \"#00000050\" --nf \"#00FF00\" --nb \"#00000050\" --ab \"#00000050\" --fb \"#00000050\" --ff \"#00FF00\" --hf \"#00FF00\" --hb \"#444444\" | xargs swaymsg exec";
+      modifier = "Mod4";
+      output.eDP-1 = {
+        bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";
+      };
+      keybindings = let
+        mod = config.wayland.windowManager.sway.config.modifier;
+      in pkgs.lib.mkOptionDefault {
+        "${mod}+Up" = "focus up";
+        "${mod}+Down" = "focus down";
+        "${mod}+Left" = "focus left";
+        "${mod}+Right" = "focus right";
+        "${mod}+Tab" = "focus parent";
+        "${mod}+Shift+Tab" = "focus child";
+
+        "${mod}+Shift+Up" = "move up";
+        "${mod}+Shift+Down" = "move down";
+        "${mod}+Shift+Left" = "move left";
+        "${mod}+Shift+Right" = "move right";
+
+        "${mod}+bar" = "split horizontal";
+        "${mod}+minus" = "split vertical";
+
+        "${mod}+Shift+c" = "kill";
+
+        "${mod}+Control+Left" = "resize shrink width 20 px";
+        "${mod}+Control+Right" = "resize grow width 20 px";
+        "${mod}+Control+Up" = "resize grow height 20 px";
+        "${mod}+Control+Down" = "resize shrink height 20 px";
+        
+        "XF86MonBrightnessUp" = "exec light -A 1";
+        "XF86MonBrightnessDown" = "exec light -U 1";
+        
+        "${mod}+Alt+Up" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d up";
+        "${mod}+Alt+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d down";
+        "${mod}+Alt+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d left";
+        "${mod}+Alt+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d right";
+
+        "${mod}+Alt+Shift+Up" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d up";
+        "${mod}+Alt+Shift+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d down";
+        "${mod}+Alt+Shift+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d left";
+        "${mod}+Alt+Shift+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d right";
+      };
+      window.border = 1;
+      colors = {
+        background = "#000000";
+        focused = {
+          background = "#000000";
+          border = "#00cc00";
+          childBorder = "#00cc00";
+          indicator = "#ffffff";
+          text = "#00ff00";
+        };
+        unfocused = {
+          background = "#000000";
+          border = "#005000";
+          childBorder = "#005000";
+          indicator = "#ffffff";
+          text = "#00ff00";
+        };
+        focusedInactive = {
+          background = "#000000";
+          border = "#005000";
+          childBorder = "#005000";
+          indicator = "#ffffff";
+          text = "#00ff00";
+        };
+        urgent = {
+          background = "#000000";
+          border = "#ff0000";
+          childBorder = "#ff0000";
+          indicator = "#ffffff";
+          text = "#00ff00";
+        };
+      };
+      fonts = {
+        names = [ "inconsolata" ];
+        size = 8.0;
+      };
+      bars = [ {
+        command = "${pkgs.waybar.outPath}/bin/waybar";
+      } ];
+      terminal = "kitty";
+      startup = [];
+    };
+    extraConfig = ''
+      input type:keyboard {
+        repeat_delay 200
+        repeat_rate 30
+      }
+    '';
+  };
+  home.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = 1;
   };
 }

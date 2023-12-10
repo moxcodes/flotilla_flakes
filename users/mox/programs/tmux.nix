@@ -37,6 +37,12 @@ bind -n M-Right select-pane -R
 bind -n M-up select-pane -U
 bind -n M-Down select-pane -D
 
+bind -n M-S-Up move-pane -h -t '.{up-of}'
+bind -n M-S-Right move-pane -t '.{right-of}'
+bind -n M-S-Left move-pane -t '.{left-of}'
+bind -n M-S-down move-pane -h -t '.{down-of}'
+
+
 bind -T copy-mode -n M-Left select-pane -L
 bind -T copy-mode -n M-Right select-pane -R
 bind -T copy-mode -n M-up select-pane -U
@@ -67,7 +73,7 @@ set-option -g status-left "\
 set-option -g status-right "\
 #[reverse,fg=${builtins.elemAt right_bg_colors 2},bg=${builtins.elemAt right_bg_colors 3}]${right_separator}\
 #[noreverse,fg=${builtins.elemAt right_fg_colors 2},bg=${builtins.elemAt right_bg_colors 2}]\
-#(gitmux -cfg ~/.gitmux.conf #{pane_current_path}) \
+#(gitmux -cfg ~/.gitmux.conf #{pane_current_path})#[noreverse,fg=${builtins.elemAt right_fg_colors 2},bg=${builtins.elemAt right_bg_colors 2}] \
 #[reverse,fg=${builtins.elemAt right_bg_colors 1},bg=${builtins.elemAt right_bg_colors 2}]${right_separator}\
 #[noreverse,fg=${builtins.elemAt right_fg_colors 1},bg=${builtins.elemAt right_bg_colors 1}]\
 #(python3 ~/tools/scripts/configuration/syncthing_status_summary/report_status_tmux.py --bg-color ${builtins.elemAt right_bg_colors 1} --fg-color ${builtins.elemAt right_fg_colors 1})\

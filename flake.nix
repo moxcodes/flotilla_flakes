@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   # note that while *in principle* home-manager package can be
   # installed via nixpkgs, if we do that it doesn't bring its

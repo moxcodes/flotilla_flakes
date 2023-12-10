@@ -20,12 +20,12 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/DE45-D1BE";
+    { device = "/dev/disk/by-uuid/6883-6505";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efi" =
-    { device = "/dev/disk/by-uuid/DE3D-CE9F";
+    { device = "/dev/disk/by-uuid/449B-190E";
       fsType = "vfat";
     };
 
@@ -34,10 +34,10 @@
       fsType = "ext4";
     };
 
-  fileSystems."/fast" =
-    { device = "/dev/disk/by-uuid/4a59313a-133c-444f-8ff7-3fd771377ada";
-      fsType = "ext4";
-    };
+  # fileSystems."/fast" =
+  #   { device = "/dev/disk/by-uuid/4a59313a-133c-444f-8ff7-3fd771377ada";
+  #     fsType = "ext4";
+  #   };
 
   swapDevices = [ ];
 
