@@ -1,4 +1,7 @@
-{config, pkgs, ...}: {
+{config, pkgs, ...}: 
+let
+  syncthing_monitor_py = pkgs.writeText "syncthing_monitor.py" (import ./syncthing_report_status_tmux.py)
+{
     enable = true;
     prefix = "C-z";
     shortcut = "z";
@@ -57,7 +60,8 @@ set -g status-right-length 100
 set -g status-justify centre
 set-option -s status-interval 1
 set -g pane-border-style fg=colour22
-set -g mode-style "fg=colour46, bg=colour238"
+set -g mode-style "fg=colour46, bg=default"
+set -g status-bg colour16
 
 set-option -g status-left "\
 #[fg=${builtins.elemAt left_fg_colors 0}, bg=${builtins.elemAt left_bg_colors 0}]\
@@ -76,7 +80,7 @@ set-option -g status-right "\
 #(gitmux -cfg ~/.gitmux.conf #{pane_current_path})#[noreverse,fg=${builtins.elemAt right_fg_colors 2},bg=${builtins.elemAt right_bg_colors 2}] \
 #[reverse,fg=${builtins.elemAt right_bg_colors 1},bg=${builtins.elemAt right_bg_colors 2}]${right_separator}\
 #[noreverse,fg=${builtins.elemAt right_fg_colors 1},bg=${builtins.elemAt right_bg_colors 1}]\
-#(python3 ~/tools/scripts/configuration/syncthing_status_summary/report_status_tmux.py --bg-color ${builtins.elemAt right_bg_colors 1} --fg-color ${builtins.elemAt right_fg_colors 1})\
+#(python3 $syncthing_monitor_py --bg-color ${builtins.elemAt right_bg_colors 1} --fg-color ${builtins.elemAt right_fg_colors 1})\
 #[reverse,fg=${builtins.elemAt right_bg_colors 0}, bg=${builtins.elemAt right_bg_colors 1}]${right_separator}\
 #[noreverse,fg=${builtins.elemAt right_fg_colors 0}, bg=${builtins.elemAt right_bg_colors 0}]%Y_%m_%d|%H:%M:%S"
 

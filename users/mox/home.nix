@@ -1,39 +1,81 @@
-{config, pkgs, ...}: {
+{config, pkgs, ...}: 
+let
+  configure-gtk = pkgs.writeTextFile {
+    name = "configure-gtk";
+    destination = "/bin/configure-gtk";
+    executable = true;
+    text = let
+      schema = pkgs.gsettings-desktop-schemas;
+      datadir = "${schema}/share/gsettings-schemas/${schema.name}";
+    in ''
+      export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
+      gnome_schema=org.gnome.desktop.interface
+      gsettings set $gnome_schema gtk-theme 'Plata-Noir'
+      gsettings set $gnome_schema icon-theme 'Paper'
+      gsettings set $gnome_schema font-name 'inconsolata 8'
+      gsettings set $gnome_schema document-font-name 'inconsolata 8'
+      gsettings set $gnome_schema monospace-font-name 'inconsolata 8'
+    '';
+  };
+  # configure-gitmux = pkgs.writeTextFile {
+  #   name = "configure-gitmux";
+  #   destination = "/home/mox/.gitmux"
+  #   executable = false;
+  #   text = 
+  # };
+in
+{
   home.packages = with pkgs;
   let
     diffusers = ps: ps.callPackage ./deriv/diffusers {};
     python-with-packages = python3.withPackages(ps: with ps; [
        beautifulsoup4
+       google-api-python-client
+       google-auth-httplib2
+       google-auth-oauthlib
        numpy
+       pyusb
        selenium
 #      huggingface-hub torch transformers (diffusers ps)
     ]);
   in
   [
+    android-tools
     awscli2
+    bat
     bemenu
     chromedriver
+    configure-gtk
     dmenu
     dmidecode
+    fd
     feh
+    fzf
     firefox-bin
     glxinfo
     gimp
     gitmux
     gnumake
+    grim
     inconsolata-nerdfont
     jq
     # TODO - try to make this a part of emacs dependencies somehow
     ispell
+    file
     font-awesome
     kitty
     krita
+    lutris
     mplayer
+    plata-theme
+    paper-gtk-theme
+    slurp
     steam
     syncthing
     tmux
     texlive.combined.scheme-full
     waybar
+    wl-clipboard
     xdg-utils
     xf86_input_wacom
     xmonad-with-packages
@@ -50,19 +92,26 @@
   home.stateVersion = "22.11";
   programs.home-manager.enable = true;
 
+  gtk = {
+    theme = "Plata-Noir";
+    iconTheme = "Paper";
+    font.name = "inconsolata";
+    font.size = 7;
+  };
+
   # Symlink /fast/mox/... to the home directory
   # To add/remove, alter the argument attribute set
   # TODO: make this conditional on an attribute so
   # that home.nix is more portable.
-  home.file = (builtins.mapAttrs
-   (name: dir: {
-      source =
-        config.lib.file.mkOutOfStoreSymlink "/fast/mox/${dir}";
-      target = "${dir}";
-   }) {
-      notes = "notes";
-      projects = "projects";
-      tools = "tools";});
+  # home.file = (builtins.mapAttrs
+  #  (name: dir: {
+  #     source =
+  #       config.lib.file.mkOutOfStoreSymlink "/fast/mox/${dir}";
+  #     target = "${dir}";
+  #  }) {
+  #     notes = "notes";
+  #     projects = "projects";
+  #     tools = "tools";});
 
   programs.git = {
     enable = true;
@@ -123,6 +172,24 @@
   };
 
   programs.tmux = (import ./programs/tmux.nix {config=config; pkgs=pkgs;});
+
+  programs.fish = {
+    enable = true;
+    functions = {
+      mx = "emacsclient -nw $argv";
+    };
+    plugins = [
+      {
+        name = "fzf";
+        src = pkgs.fetchFromGitHub {
+          owner = "PatrickF1";
+          repo = "fzf.fish";
+          rev = "e5d54b93cd3e096ad6c2a419df33c4f50451c900";
+          sha256 = "5cO5Ey7z7KMF3vqQhIbYip5JR6YiS2I9VPRd6BOmeC8=";
+        };
+      }
+    ];
+  };
 
   programs.zathura = {
     enable = true;
@@ -408,9 +475,11 @@
         names = [ "inconsolata" ];
         size = 8.0;
       };
-      bars = [ {
-        command = "${pkgs.waybar.outPath}/bin/waybar";
-      } ];
+      bars = [
+      #  {
+      #   command = "${pkgs.waybar.outPath}/bin/waybar";
+      # }
+       ];
       terminal = "kitty";
       startup = [];
     };
@@ -419,6 +488,8 @@
         repeat_delay 200
         repeat_rate 30
       }
+
+      exec configure-gtk
     '';
   };
   home.sessionVariables = {

@@ -118,7 +118,7 @@
   users.users.mox = {
     isNormalUser = true;
     description = "Jordan Moxon";
-    extraGroups = [ "docker" "networkmanager" "video" "wheel" ];
+    extraGroups = [ "docker" "networkmanager" "video" "wheel" "disk" ];
     shell = pkgs.fish;
   };
 
@@ -146,14 +146,18 @@
     emacs
     fish
     git
+    glib
     greetd.tuigreet
     gparted
     lm_sensors
     lshw
     (python3.withPackages(ps: with ps; [ pandas ]))
+    ntfs3g
     pciutils
+    pv
     rustc
     sway
+    xorg.xhost
     wget
   ];
 

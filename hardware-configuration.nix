@@ -30,8 +30,8 @@
     };
 
   fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/c0719097-97b3-4d93-a85b-b44195b579b7";
-      fsType = "ext4";
+    { device = "/dev/disk/by-uuid/32cc77df-0474-4f0b-9c2d-9500013359fd";
+      fsType = "btrfs";
     };
 
   # fileSystems."/fast" =
