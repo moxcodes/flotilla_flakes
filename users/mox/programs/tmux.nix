@@ -1,6 +1,7 @@
 {config, pkgs, ...}: 
 let
-  syncthing_monitor_py = pkgs.writeText "syncthing_monitor.py" (import ./syncthing_report_status_tmux.py)
+  syncthing_monitor_py = pkgs.writeText "syncthing_monitor.py" (import ./syncthing_report_status_tmux.py);
+in
 {
     enable = true;
     prefix = "C-z";
@@ -77,7 +78,7 @@ set-option -g status-left "\
 set-option -g status-right "\
 #[reverse,fg=${builtins.elemAt right_bg_colors 2},bg=${builtins.elemAt right_bg_colors 3}]${right_separator}\
 #[noreverse,fg=${builtins.elemAt right_fg_colors 2},bg=${builtins.elemAt right_bg_colors 2}]\
-#(gitmux -cfg ~/.gitmux.conf #{pane_current_path})#[noreverse,fg=${builtins.elemAt right_fg_colors 2},bg=${builtins.elemAt right_bg_colors 2}] \
+#(gitmux -cfg ~/.config/gitmux/gitmux.conf #{pane_current_path})#[noreverse,fg=${builtins.elemAt right_fg_colors 2},bg=${builtins.elemAt right_bg_colors 2}] \
 #[reverse,fg=${builtins.elemAt right_bg_colors 1},bg=${builtins.elemAt right_bg_colors 2}]${right_separator}\
 #[noreverse,fg=${builtins.elemAt right_fg_colors 1},bg=${builtins.elemAt right_bg_colors 1}]\
 #(python3 $syncthing_monitor_py --bg-color ${builtins.elemAt right_bg_colors 1} --fg-color ${builtins.elemAt right_fg_colors 1})\
@@ -124,4 +125,4 @@ run-shell ${pkgs.tmuxPlugins.continuum.outPath}/share/tmux-plugins/continuum/con
         plugin = tmuxPlugins.sessionist;
       }
     ];
-  }
+}

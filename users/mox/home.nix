@@ -25,6 +25,7 @@ let
   # };
 in
 {
+  imports = [ ./modules/gitmux.nix ];
   home.packages = with pkgs;
   let
     diffusers = ps: ps.callPackage ./deriv/diffusers {};
@@ -172,6 +173,25 @@ in
   };
 
   programs.tmux = (import ./programs/tmux.nix {config=config; pkgs=pkgs;});
+  programs.gitmux = {
+    enable = true;
+    styles.clear = "#[fg=white]";
+    symbols = {
+      branch = " ";
+      hashprefix = "#";
+      ahead = "󰶼";
+      behind = "󰶹";
+      staged = "󱒌 ";
+      conflict = " ";
+      modified = " ";
+      untracked = " ";
+      stashed = "󰽃 ";
+      insertions = "+";
+      deletions = "-";
+      clean = " ";
+    };
+    layout = ''[branch, " ▏", divergence, " ▏", flags, " ▏", stats ]'';
+  };
 
   programs.fish = {
     enable = true;
