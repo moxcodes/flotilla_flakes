@@ -198,6 +198,79 @@ in
     functions = {
       mx = "emacsclient -nw $argv";
     };
+    shellInit = ''
+set -U fish_greeting ""
+# handy function from projekt0n/biscuit
+set right_segment_separator "▕"
+set left_segment_separator "▏"
+function prompt_segment -d "Function to draw a segment"
+  set -l bg
+  set -l fg
+  if [ -n "$argv[2]" ]
+    set bg $argv[2]
+  else
+    set bg normal
+  end
+  if [ -n "$argv[3]" ]
+    set fg $argv[3]
+  else
+    set fg normal
+  end
+
+  set -l sep_col (set_color $argv[1] -b $bg)
+  set -l txt_col (set_color -o $fg -b $bg)
+  set -l normal (set_color normal)
+
+  set -l lsep $sep_col $left_segment_separator
+  set -l rsep $sep_col $right_segment_separator
+
+  if [ -n "$argv[4]" ]
+    set -l data  $txt_col $argv[4] $normal
+    echo -n -s $lsep $data $rsep
+  end
+  set_color normal -b normal
+end
+function fish_prompt
+  set -l this_status $status
+  set -l color white
+  if test $this_status -eq 1
+    set color ff31aa
+  else if test $this_status -ge 126 && test $this_status -le 127
+    set color ff8700
+  else if test $this_status -eq 130
+    set color ffec00
+  else if test $this_status -ge 128
+    set color cc00ff
+  else if test $this_status -ge 1
+    set color ff0000
+  else
+    set color white
+  end
+  prompt_segment $color 222 green (prompt_hostname)
+  echo -n " "
+  prompt_segment $color 222 cyan (date '+%H:%M:%S')
+  echo -n " "
+end
+function fish_right_prompt
+  set -l this_status $status
+  set -l color white
+  if test $this_status -eq 1
+    set color ff31aa
+  else if test $this_status -ge 126 && test $this_status -le 127
+    set color ff8700
+  else if test $this_status -eq 130
+    set color ffec00
+  else if test $this_status -ge 128
+    set color cc00ff
+  else if test $this_status -ge 1
+    set color ff0000
+  else
+    set color white
+  end
+  prompt_segment $color 222 red (pwd)
+end
+  set_color
+    '';
     plugins = [
       {
         name = "fzf";
