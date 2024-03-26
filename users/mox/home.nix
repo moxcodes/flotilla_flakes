@@ -199,6 +199,7 @@ in
       mx = "emacsclient -nw $argv";
     };
     shellInit = ''
+set -g EDITOR "emacsclient -nw"
 set -U fish_greeting ""
 # handy function from projekt0n/biscuit
 set right_segment_separator "▕"
@@ -267,7 +268,7 @@ function fish_right_prompt
   else
     set color white
   end
-  prompt_segment $color 222 red (pwd)
+  prompt_segment $color 222 red (prompt_pwd)
 end
   set_color
     '';
