@@ -60,6 +60,16 @@
     };
   };
 
+  sops = {
+    defaultSopsFile = ./secrets/example.yaml;
+    age = {
+      keyFile = "/var/lib/sops-nix/key.txt";
+      generateKey = true;
+    };
+    secrets.example_key = {};
+    secrets.example_number = {};
+  };
+
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];

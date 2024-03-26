@@ -41,6 +41,7 @@ in
     ]);
   in
   [
+    age
     android-tools
     awscli2
     bat
@@ -68,9 +69,11 @@ in
     krita
     lutris
     mplayer
+    obsidian
     plata-theme
     paper-gtk-theme
     slurp
+    sops
     steam
     syncthing
     tmux
