@@ -126,9 +126,6 @@ in
       ".*"
     ];
     delta.enable = true;
-    delta.options = {
-      side-by-side = true;
-    };
     extraConfig = {
       init.defaultBranch = "main";
     };
