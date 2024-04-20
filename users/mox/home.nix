@@ -25,7 +25,7 @@ let
   # };
 in
 {
-  imports = [ ./modules/gitmux.nix ];
+  imports = [ ./modules/gitmux.nix ./modules/spacemacs.nix ];
   home.packages = with pkgs;
   let
     diffusers = ps: ps.callPackage ./deriv/diffusers {};
@@ -116,6 +116,25 @@ in
   #     notes = "notes";
   #     projects = "projects";
   #     tools = "tools";});
+
+  home.file.".spacemacs.d" = {
+    recursive = true;
+    source = pkgs.fetchFromGitHub {
+      owner = "syl20bnr";
+      repo = "spacemacs";
+      # spacemacs hasn't cut a release since 2018, so just grab
+      # the latest hash whenever you decide to update :|
+      rev = "a58a7d79b3713bcf693bb61d9ba83d650a6aba86";
+      sha256 = "D5uI9nIf0Ocxs6ZPj9/BebFM81bizZdSAHRu43csuMA=";
+    };
+  };
+  home.file.".emacs.d/init.el" = {
+    recursive = true;
+    source = pkgs.writeTextFile {
+      name = "init.el";
+      text = "(load-file \"~/.spacemacs.d/init.el\")\n";
+    };
+  };
 
   programs.git = {
     enable = true;
