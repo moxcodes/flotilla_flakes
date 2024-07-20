@@ -17,29 +17,23 @@ let
       gsettings set $gnome_schema monospace-font-name 'inconsolata 8'
     '';
   };
-  # configure-gitmux = pkgs.writeTextFile {
-  #   name = "configure-gitmux";
-  #   destination = "/home/mox/.gitmux"
-  #   executable = false;
-  #   text = 
-  # };
 in
 {
-  imports = [ ./modules/gitmux.nix ./modules/spacemacs.nix ];
+  imports = [ ./modules/gitmux.nix ./modules/spacemacs.nix ./modules/python_manager.nix];
+  python_manager =  with pkgs; {
+    enable = true;
+    python = python3;
+    python_manager.python_packages = [
+      "beautifulsoup4"
+      "google-api-python-client"
+      "google-auth-httplib2"
+      "google-auth-oauthlib"
+      "numpy"
+      "pyusb"
+      "selenium"
+    ];
+  };
   home.packages = with pkgs;
-  let
-    diffusers = ps: ps.callPackage ./deriv/diffusers {};
-    python-with-packages = python3.withPackages(ps: with ps; [
-       beautifulsoup4
-       google-api-python-client
-       google-auth-httplib2
-       google-auth-oauthlib
-       numpy
-       pyusb
-       selenium
-#      huggingface-hub torch transformers (diffusers ps)
-    ]);
-  in
   [
     age
     android-tools
@@ -83,12 +77,9 @@ in
     wl-clipboard
     xdg-utils
     xf86_input_wacom
-    xmonad-with-packages
     xorg.xev
     zathura
     zoom-us
-#    python3
-    python-with-packages
     (callPackage ./deriv/multibg-sway { })
   ];
 
