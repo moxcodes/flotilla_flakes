@@ -31,6 +31,7 @@ in
       "numpy"
       "pyusb"
       "selenium"
+      "websocket-client"
     ];
   };
   home.packages = with pkgs;
@@ -41,6 +42,7 @@ in
     alsa-utils
     bat
     bemenu
+    browsh
     chromedriver
     configure-gtk
     dmenu
