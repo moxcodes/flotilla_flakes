@@ -21,6 +21,14 @@
                     { home_manager_path = home-manager.outPath; })
           ];
       };
+      ares = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./surface_go_configuration.nix
+            (import ./users
+                    { home_manager_path = home-manager.outPath; })
+          ];
+      };
     };
   };
 }
