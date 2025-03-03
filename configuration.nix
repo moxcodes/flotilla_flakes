@@ -182,9 +182,8 @@
   ];
 
   fonts.fonts = with pkgs; [
-    inconsolata
-    inconsolata-nerdfont
-    (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
+    nerd-fonts.inconsolata
+    nerd-fonts.symbols-only
   ];
 
   programs.fish.enable = true;

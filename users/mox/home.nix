@@ -54,7 +54,8 @@ in
     gitmux
     gnumake
     grim
-    inconsolata-nerdfont
+    nerd-fonts.inconsolata
+    nerd-fonts.symbols-only
     jq
     # TODO - try to make this a part of emacs dependencies somehow
     ispell
@@ -92,7 +93,7 @@ in
   gtk = {
     theme = "Plata-Noir";
     iconTheme = "Paper";
-    font.name = "inconsolata";
+    font.name = "InconsolataNerdFont";
     font.size = 7;
   };
 
@@ -125,7 +126,7 @@ in
   programs.kitty = {
     enable = true;
     font = {
-      name = "inconsolata";
+      name = "InconsolataNerdFont";
       size = 8.0;
     };
     settings = {
@@ -673,7 +674,7 @@ end
   in {
     enable = true;
     config = rec {
-      menu = "bemenu-run --fn \"inconsolata\" -p \"▶\" --tf \"#00FF00FF\" --tb \"#00000050\" --nf \"#00FF00\" --nb \"#00000050\" --ab \"#00000050\" --fb \"#00000050\" --ff \"#00FF00\" --hf \"#00FF00\" --hb \"#444444\" | xargs swaymsg exec";
+      menu = "bemenu-run --fn \"InconsolataNerdFont\" -p \"▶\" --tf \"#00FF00FF\" --tb \"#00000050\" --nf \"#00FF00\" --nb \"#00000050\" --ab \"#00000050\" --fb \"#00000050\" --ff \"#00FF00\" --hf \"#00FF00\" --hb \"#444444\" | xargs swaymsg exec";
       modifier = "Mod4";
       output.eDP-1 = {
         bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";
