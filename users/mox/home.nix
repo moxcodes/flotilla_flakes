@@ -390,6 +390,11 @@ in
     };
     shellInit = ''
 set -g EDITOR "emacsclient -nw"
+if test -n "$DEVSHELL"
+else
+  set -x DEVSHELL ""
+  set -x DEVSHELL_ICON ""
+end
 set -U fish_greeting ""
 # handy function from projekt0n/biscuit
 set right_segment_separator "▕"
@@ -438,6 +443,7 @@ function fish_prompt
     set color white
   end
   prompt_segment $color 222 green (prompt_hostname)
+  echo -n $DEVSHELL_ICON
   echo -n " "
   prompt_segment $color 222 cyan (date '+%H:%M:%S')
   echo -n " "
