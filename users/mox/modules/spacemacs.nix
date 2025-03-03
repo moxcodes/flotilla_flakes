@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ...}:
+{ config, lib, pkgs, python_manager, ...}:
 with lib;
 let
   cfg = config.programs.spacemacs;
@@ -1141,10 +1141,6 @@ in {
             then (attrsets.attrByPath["python" "variables" "python-lsp-server"]
                   "'pylsp")
               else  "";
-          python_with_pylsp = python3.withPackages(ps: with ps; [
-            python-lsp-server
-          ]);
-
         in
           mkMerge [
             (mkIf (cpp_backend == "'lsp-ccls") [ccls])
@@ -1153,9 +1149,18 @@ in {
               ((attrsets.attrByPath ["nixos" "variables" "nix-backend" ] "" cfg.layers)
                == "'lsp")
               [(builtins.getFlake "github:nix-community/rnix-lsp/95d40673fe43642e2e1144341e86d0036abd95d9").packages."${system}".rnix-lsp ])
-            (mkIf true #(python_backend == "'pylsp")
-              [python_with_pylsp])
+            (mkIf (attrsets.hasAttrByPath ["rust"] cfg.layers) [rust-analyzer clippy rustfmt])
           ]
       );
+    python_manager.python_packages = with pkgs; with lib;
+      mkIf (attrsets.hasAttrByPath ["lsp"] cfg.layers) (
+        let python_backend = if (attrsets.hasAttrByPath ["python"] cfg.layers)
+          then (attrsets.attrByPath["python" "variables" "python-lsp-server"]
+                "'pylsp" cfg.layers.python)
+          else  "";
+        in
+          mkMerge [
+      (mkIf (python_backend == "'pylsp") ["python-lsp-server"])
+      ]);
   };
 }

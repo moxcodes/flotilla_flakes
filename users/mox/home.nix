@@ -23,7 +23,7 @@ in
   python_manager =  with pkgs; {
     enable = true;
     python = python3;
-    python_manager.python_packages = [
+    python_packages = [
       "beautifulsoup4"
       "google-api-python-client"
       "google-auth-httplib2"
@@ -206,7 +206,11 @@ in
         };
       };
       php = {};
-      python = {};
+      python = {
+        variables = {
+          "python-lsp-server" = "'pylsp";
+        };
+      };
       rust = {};
       sql = {};
       treemacs = {};

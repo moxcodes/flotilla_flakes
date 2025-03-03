@@ -1,6 +1,6 @@
 { config, lib, pkgs, ...}:
 let
-    cfg = config.python_manger;
+    cfg = config.python_manager;
 in
 with lib;
 {
@@ -8,10 +8,8 @@ with lib;
     python_manager = {
       enable = mkEnableOption "python manager";
       python_packages = mkOption {
-        type = listOf package;
+        type = listOf str;
         default = [];
-        merge = (pkg_lists:
-          lists.unique (lists.flatten pkg_lists));
       };
       python = mkOption {
         type = package;
@@ -21,8 +19,9 @@ with lib;
   };
   config = mkIf cfg.enable {
     home.packages = [
-      cfg.python.withPackages(ps:
-        lib.lists.forEach cfg.python_packages (pack: ps.${pack}))
+      (cfg.python.withPackages(ps:
+        lib.lists.forEach cfg.python_packages (pack:
+          ps.${pack})))
     ];
   };
 }

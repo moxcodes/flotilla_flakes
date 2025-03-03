@@ -173,7 +173,6 @@
     gparted
     lm_sensors
     lshw
-    (python3.withPackages(ps: with ps; [ pandas ]))
     ntfs3g
     pciutils
     pv
