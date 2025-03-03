@@ -12,9 +12,9 @@ let
       gnome_schema=org.gnome.desktop.interface
       gsettings set $gnome_schema gtk-theme 'Plata-Noir'
       gsettings set $gnome_schema icon-theme 'Paper'
-      gsettings set $gnome_schema font-name 'inconsolata 8'
-      gsettings set $gnome_schema document-font-name 'inconsolata 8'
-      gsettings set $gnome_schema monospace-font-name 'inconsolata 8'
+      gsettings set $gnome_schema font-name 'InconsolataNerdFont 8'
+      gsettings set $gnome_schema document-font-name 'InconsolataNerdFont 8'
+      gsettings set $gnome_schema monospace-font-name 'InconsolataNerdFont 8'
     '';
   };
 in

@@ -61,7 +61,7 @@ set -g status-right-length 100
 set -g status-justify centre
 set-option -s status-interval 1
 set -g pane-border-style fg=colour22
-set -g mode-style "fg=colour46, bg=default"
+set -g mode-style "fg=colour48, bg=colour236"
 set -g status-bg colour16
 
 set-option -g status-left "\
