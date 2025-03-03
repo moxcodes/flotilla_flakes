@@ -60,14 +60,22 @@
     };
   };
 
-  sops = {
-    defaultSopsFile = ./secrets/example.yaml;
-    age = {
+  sops.defaultSopsFile = ./secrets/example.yaml;
+  sops.age = {
       keyFile = "/var/lib/sops-nix/key.txt";
       generateKey = true;
     };
-    secrets.example_key = {};
-    secrets.example_number = {};
+  sops.secrets.example_key = {};
+
+  sops.templates.test_template.content = ''
+      password = "${config.sops.placeholder.example_key}"
+    '';
+
+  systemd.services.myservice = {
+    serviceConfig = {
+      ExecStart = "/not/a/path --config ${config.sops.templates.test_template.path} --secret ${config.sops.placeholder.example_key}";
+      User = "serviceuser";
+    };
   };
 
   # Enable the X11 windowing system.
