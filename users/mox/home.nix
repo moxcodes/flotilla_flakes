@@ -38,6 +38,7 @@ in
     age
     android-tools
     awscli2
+    alsa-utils
     bat
     bemenu
     chromedriver

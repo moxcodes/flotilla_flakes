@@ -116,7 +116,6 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   security.polkit.enable = true;
@@ -161,7 +160,6 @@
     __GLX_VENDOR_LIBARARY_NAME="nvidia";
   };
   environment.systemPackages = with pkgs; [
-    busybox
     cargo
     clang
     docker
