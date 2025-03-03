@@ -81,8 +81,12 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];
+  services.blueman.enable = true;
   hardware.opengl.enable = true;
   hardware.opengl.driSupport32Bit = true;
+
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
 
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
   hardware.nvidia.modesetting.enable = true;
