@@ -270,9 +270,10 @@ in
       };
     };
     global_config = {
-      remove_keybindings = ["M-]" "M-[" "<left>" "<right>" "<up>" "<down>"
+      remove_keybindings = ["<left>" "<right>" "<up>" "<down>"
                             "C-<left>" "C-<right>" "C-<up>" "C-<down>" "M-;" "M-c"
-                            "C-?" "M-." "M-TAB" "C-i" "M-s"];
+                            "C-?" "M-." "M-TAB" "C-i" "M-s" "M-j" "M-i" "M-o"
+                            "M-I" "M-O"];
       keybindings = {
         "M-n" = "'forward-paragraph";
         "M-p" = "'backward-paragraph";
@@ -282,13 +283,15 @@ in
         "M-N" = "(lambda () (interactive) (next-line 5))";
         "C-h" = "'delete-backward-char";
         "M-h" = "'backward-kill-word";
+        "M-j" = "'find-file-at-point";
+        "C-j" = "'browse-url-at-point";
         "M-;" = "'toggle-comment-on-line";
         "M-." = "'lsp-find-definition";
         "M-s" = "'counsel-git-grep";
-        "M-[" = "'backward-local-mark";
-        "M-]" = "'forward-local-mark";
-        "M-{" = "'backward-global-mark";
-        "M-}" = "'forward-global-mark";
+        "M-i" = "'backward-local-mark";
+        "M-o" = "'forward-local-mark";
+        "M-I" = "'backward-global-mark";
+        "M-O" = "'forward-global-mark";
         "M-TAB" = "'lsp-format-region";
         "M-q" = "'fill-sentence";
         "C-?" = "'help-command";
