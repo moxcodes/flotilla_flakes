@@ -8,17 +8,13 @@
   # module along, so we have to pull in from github.
   inputs.home-manager.url = "github:nix-community/home-manager";
   inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
   outputs = {nixpkgs, home-manager, sops-nix, self}@inputs: {
 
-    # homeConfigurations = {
-    #   mox = home-manager.lib.homeManagerConfiguration {
-    #     modules = [ (import ./home.nix) ];
-    #   };
-    # };
     nixosConfigurations = {
       rocinante = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-        modules = [
+          modules = [
             ./configuration.nix
             sops-nix.nixosModules.sops
             (import ./users
