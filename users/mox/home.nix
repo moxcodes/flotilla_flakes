@@ -82,6 +82,7 @@ in
     xdg-utils
     xf86_input_wacom
     xorg.xev
+    wlr-randr
     zathura
     zoom-us
     (callPackage ./deriv/multibg-sway { })
@@ -539,9 +540,63 @@ end
         height = 10;
         output = [
           "eDP-1"
+          "HDMI-A-1"
         ];
+        modules-left = [ "sway/workspaces" ];
+        # modules-right = [ "cpu" "clock" "bluetooth" ];
+        modules-center = [];
+        "sway/workspaces" = {
+          format = "{name}{icon}";
+          on-click = "activate";
+          format-icons = {
+            "1" = " ";
+            "2" = " ";
+            "3" = " ";
+            "4" = " ";
+            "5" = " ⊙";
+            "6" = " ";
+            "7" = " ";
+            "8" = " ";
+            "9" = " ";
+            "10" = " ";
+            "11" = " ";
+            "12" = " ";
+            "13" = " ";
+            "14" = " ⊙";
+            "15" = " ";
+            "16" = " ";
+            "17" = " ";
+            "18" = " ";
+          };
+        };
       };
     };
+    style = ''
+        * {
+          font-family: InconsolataNerdFont;
+          padding: 0 0;
+          margin: -2 0;
+          transition: all 0.0s ease;
+        }
+
+        #workspaces {
+          padding: 0 4;
+          margin: -2 0;
+        }
+        #workspaces button {
+          padding: 0 0;
+          margin: -2 -1;
+          box-shadow: inset 0px 9px 0px 1px #008800,
+                      inset 0px -9px 0px 1px #008800;
+        }
+        #workspacesB button.visible {
+          padding: 0 0;
+          margin: -2 -1;
+          color: #00ff00;
+          box-shadow: inset 0px 9px 0px 1px #00ff00,
+                      inset 0px -9px 0px 1px #00ff00;
+        }
+    '';
   };
 
   services.emacs.enable = true;
@@ -656,8 +711,9 @@ end
         esac
       done
       CURRENT=`${pkgs.sway.outPath}/bin/swaymsg -t get_workspaces | ${pkgs.jq.outPath}/bin/jq '.[] | select(.focused==true) | .num'`
+      BLOCK=$(( ($CURRENT - 1) / ($COLUMNS * $ROWS)))
       COL=$(( ($CURRENT - 1) % $COLUMNS))
-      ROW=$(( ($CURRENT - 1) / $COLUMNS))
+      ROW=$(( (($CURRENT - 1) / $COLUMNS) % $ROWS))
       if [[ $DIRECTION == "up" ]]; then
         ROW=$(( ($ROW - 1 + $ROWS) % $ROWS ))
       elif [[ $DIRECTION == "down" ]]; then
@@ -667,7 +723,7 @@ end
       else
         COL=$(( ($COL + 1) % $COLUMNS ))
       fi
-      NEW=$(( $ROW * $COLUMNS + $COL + 1))
+      NEW=$(( $BLOCK * $ROWS * $COLUMNS + $ROW * $COLUMNS + $COL + 1))
       if [[ $MOVE_WINDOW == True ]]; then
         ${pkgs.sway.outPath}/bin/swaymsg move container to workspace $NEW
       fi
@@ -678,9 +734,6 @@ end
     config = rec {
       menu = "bemenu-run --fn \"InconsolataNerdFont\" -p \"▶\" --tf \"#00FF00FF\" --tb \"#00000050\" --nf \"#00FF00\" --nb \"#00000050\" --ab \"#00000050\" --fb \"#00000050\" --ff \"#00FF00\" --hf \"#00FF00\" --hb \"#444444\" | xargs swaymsg exec";
       modifier = "Mod4";
-      output.eDP-1 = {
-        bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";
-      };
       keybindings = let
         mod = config.wayland.windowManager.sway.config.modifier;
       in pkgs.lib.mkOptionDefault {
@@ -718,6 +771,8 @@ end
         "${mod}+Alt+Shift+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d down";
         "${mod}+Alt+Shift+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d left";
         "${mod}+Alt+Shift+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d right";
+        "${mod}+Alt+Control+Shift+Right" = "move workspace to output right";
+        "${mod}+Alt+Control+Shift+Left" = "move workspace to output left";
       };
       window.border = 1;
       colors = {
@@ -752,18 +807,23 @@ end
         };
       };
       fonts = {
-        names = [ "inconsolata" ];
+        names = [ "InconsolataNerdFont" ];
         size = 8.0;
       };
       bars = [
-      #  {
-      #   command = "${pkgs.waybar.outPath}/bin/waybar";
-      # }
-       ];
+        {
+          command = "waybar";
+        }
+      ];
+      output = {
+        "eDP-1" = { bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";  pos = "0 0"; res = "1920x1080"; };
+      };
       terminal = "kitty";
       startup = [];
     };
+    checkConfig = false;
     extraConfig = ''
+      output HDMI-A-1 mode 2560x1440 pos 1920 0 scale 1
       input type:keyboard {
         repeat_delay 200
         repeat_rate 30
