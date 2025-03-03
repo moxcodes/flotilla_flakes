@@ -986,7 +986,7 @@ in {
             repo = "spacemacs";
             # spacemacs hasn't cut a release since 2018, so just grab
             # the latest hash whenever you decide to update :|
-            rev = "a58a7d79b3713bcf693bb61d9ba83d650a6aba86";
+            rev = "c3269f6a3b9ce8ee57f362c2b053b5381f8727e3";
             sha256 = "D5uI9nIf0Ocxs6ZPj9/BebFM81bizZdSAHRu43csuMA=";
           };
         };
