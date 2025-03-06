@@ -18,7 +18,7 @@
             ./configuration.nix
             sops-nix.nixosModules.sops
             (import ./users
-                    { home_manager_path = home-manager.outPath; })
+                    { home_manager_path = home-manager.outPath; sysname = "ares"; })
           ];
       };
       ares = nixpkgs.lib.nixosSystem {
@@ -26,7 +26,7 @@
           modules = [
             ./surface_go_configuration.nix
             (import ./users
-                    { home_manager_path = home-manager.outPath; })
+                    { home_manager_path = home-manager.outPath; sysname = "ares"; })
           ];
       };
     };

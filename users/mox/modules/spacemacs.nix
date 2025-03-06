@@ -987,7 +987,7 @@ in {
             # spacemacs hasn't cut a release since 2018, so just grab
             # the latest hash whenever you decide to update :|
             rev = "c3269f6a3b9ce8ee57f362c2b053b5381f8727e3";
-            sha256 = "D5uI9nIf0Ocxs6ZPj9/BebFM81bizZdSAHRu43csuMA=";
+            sha256 = "KK8TbhAeSJwpH1wkaqgxBpa46EQEJ+KgHTAehxIaRmk=";
           };
         };
         ".spacemacs" = {

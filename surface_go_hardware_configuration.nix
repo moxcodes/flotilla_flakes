@@ -25,6 +25,15 @@
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
+  fileSystems."/mnt/media" =
+     { device = "/dev/mmcblk0p1";
+      fsType = "extfat";
+      options = [
+        "uid=1000"
+        "gid=1000"
+      ];
+    };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

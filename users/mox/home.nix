@@ -1,3 +1,4 @@
+{custom}:
 {config, pkgs, ...}:
 let
   configure-gtk = pkgs.writeTextFile {
@@ -45,6 +46,7 @@ in
     browsh
     chromedriver
     configure-gtk
+    dconf
     dmenu
     dmidecode
     fd
@@ -94,10 +96,17 @@ in
   programs.home-manager.enable = true;
 
   gtk = {
-    theme = "Plata-Noir";
-    iconTheme = "Paper";
+    enable = true;
+    theme = {
+      package = pkgs.plata-theme;
+      name = "Plata-Noir";
+    };
+    iconTheme = {
+      package = pkgs.paper-icon-theme;
+      name = "Paper";
+    };
     font.name = "InconsolataNerdFont";
-    font.size = 7;
+    font.size = custom.fontsize;
   };
 
   programs.git = {
@@ -130,7 +139,7 @@ in
     enable = true;
     font = {
       name = "InconsolataNerdFont";
-      size = 8.0;
+      size = 10.0;
     };
     settings = {
       cursor = "#00DD00";
@@ -552,7 +561,7 @@ end
           "HDMI-A-1"
         ];
         modules-left = [ "sway/workspaces" ];
-        # modules-right = [ "cpu" "clock" "bluetooth" ];
+        modules-right = [ "clock" "battery" ];
         modules-center = [];
         "sway/workspaces" = {
           format = "{name}{icon}";
@@ -817,7 +826,7 @@ end
       };
       fonts = {
         names = [ "InconsolataNerdFont" ];
-        size = 8.0;
+        size = 10.0;
       };
       bars = [
         {
@@ -825,7 +834,7 @@ end
         }
       ];
       output = {
-        "eDP-1" = { bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";  pos = "0 0"; res = "1920x1080"; };
+        "eDP-1" = { bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";  pos = "0 0"; res = "1920x1080"; scale = "1.0"; };
       };
       terminal = "kitty";
       startup = [];

@@ -14,7 +14,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "ares"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -48,12 +48,38 @@
     variant = "";
   };
 
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd \"sway --unsupported-gpu -d\"";
+      user = "greeter";
+    };
+  };
+
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mox = {
     isNormalUser = true;
     description = "jordan";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "docker" "networkmanager" "video" "wheel" "disk" ];
+    shell = pkgs.fish;
     packages = with pkgs; [];
+  };
+
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  security.polkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
   };
 
   # Allow unfree packages
@@ -62,10 +88,41 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    cargo
+    clang
+    docker
+    emacs
+    fish
+    git
+    glib
+    greetd.tuigreet
+    gparted
+    lm_sensors
+    lshw
+    ntfs3g
+    pciutils
+    pv
+    rustc
+    sway
+    upower
+    xorg.xhost
+    wget
   ];
+  services.thermald.enable = true;
+  services.auto-cpufreq.enable = true;
+  services.auto-cpufreq.settings = {
+    battery = {
+      governor = "powersave";
+      turbo = "never";
+    };
+    charger = {
+      governor = "performance";
+      turbo = "auto";
+    };
+  };
 
+  programs.fish.enable = true;
+  programs.light.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -84,6 +141,22 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+   hardware.graphics.enable = true;
+
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
+  virtualisation.docker.enable = true;
+
+  # Open ports in the firewall.
+  networking.firewall.allowedTCPPorts = [
+    # Syncthing ports (gui and sync protocol) - for mox
+    8384 22000
+  ];
+  networking.firewall.allowedUDPPorts = [
+    # Syncthing ports (sync protocol) - for mox
+    22000 21027
+  ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

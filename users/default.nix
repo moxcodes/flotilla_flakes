@@ -1,4 +1,4 @@
-{ home_manager_path }:
+{ home_manager_path, sysname }:
 { config, pkgs, ... }:
 {
   imports = [
@@ -13,6 +13,6 @@
                 ( n: _: n != "default.nix" && ! pkgs.lib.hasPrefix "." n )
                 (builtins.readDir ./.);
             in
-              builtins.listToAttrs (map (username: { name = "${username}"; value = import ./${username}/home.nix; }) (builtins.attrNames usernames));
+              builtins.listToAttrs (map (username: { name = "${username}"; value = (import ./${username}/home.nix {custom = import ./${username}/customizations.nix; }); }) (builtins.attrNames usernames));
   };
 }
