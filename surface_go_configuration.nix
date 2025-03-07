@@ -114,7 +114,7 @@
     battery = {
       governor = "powersave";
       turbo = "never";
-      scaling_max_freq = "500000";
+      scaling_max_freq = "800000";
     };
     charger = {
       governor = "performance";
