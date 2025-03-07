@@ -3,8 +3,8 @@
 A repository for my personal nixos flakes, still very much a work in progress.
 
 Current members of the flotilla:
-- rocinante
+- rocinante (for a big-ish laptop w/ WM config)
+- ares (for a little-ish tablet w/ WM config)
 
-(yeah, we're just getting started...)
 
 Licence: 'unlicense' (public domain) -- see LICENSE.txt
