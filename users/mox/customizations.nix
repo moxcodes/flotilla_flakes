@@ -6,8 +6,9 @@
 }: {
   fontsize =
     {
-      "ares" = 10;
-      "rocinante" = 7;
+      "ares" = 10.0;
+      "rocinante" = 7.0;
     }
     ."${sysname}";
+  
 }

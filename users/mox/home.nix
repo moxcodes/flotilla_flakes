@@ -143,7 +143,7 @@ in {
     enable = true;
     font = {
       name = "InconsolataNerdFont";
-      size = 10.0;
+      size = custom.fontsize + 0.0;
     };
     settings = {
       cursor = "#00DD00";
@@ -869,7 +869,7 @@ in {
       };
       fonts = {
         names = ["InconsolataNerdFont"];
-        size = 10.0;
+        size = custom.fontsize + 0.0;
       };
       bars = [
         {
