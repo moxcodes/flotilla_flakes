@@ -1,6 +1,11 @@
-{ config, lib, pkgs, python_manager, ...}:
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  python_manager,
+  ...
+}:
+with lib; let
   cfg = config.programs.spacemacs;
 
   spacemacsLayerType = types.submodule {
@@ -16,14 +21,23 @@ let
 
   packageSetupType = types.submodule {
     options = with types; {
-      init = mkOption { type = str; default = "";};
-      config = mkOption { type = str; default = "";};
+      init = mkOption {
+        type = str;
+        default = "";
+      };
+      config = mkOption {
+        type = str;
+        default = "";
+      };
     };
   };
 
   generalConfType = types.submodule {
     options = with types; {
-      remove_keybindings = mkOption { type = listOf str; default = []; };
+      remove_keybindings = mkOption {
+        type = listOf str;
+        default = [];
+      };
       keybindings = mkOption {
         type = attrsOf str;
         default = {};
@@ -37,18 +51,23 @@ let
         default = {};
         description = "Variables with to assign during init";
       };
-      extra_config = mkOption { type = str; default = ""; };
+      extra_config = mkOption {
+        type = str;
+        default = "";
+      };
     };
   };
-  
-  colorType = types.nullOr (types.strMatching "#[0-9A-F]{6}|nil");
 
+  colorType = types.nullOr (types.strMatching "#[0-9A-F]{6}|nil");
 in {
   options = with types; {
     programs.spacemacs = {
       enable = mkEnableOption "spacemacs, a configuration layer for emacs";
 
-      layers = mkOption { type = attrsOf spacemacsLayerType; default = {}; };
+      layers = mkOption {
+        type = attrsOf spacemacsLayerType;
+        default = {};
+      };
 
       extra_packages = mkOption {
         type = attrsOf packageSetupType;
@@ -56,7 +75,7 @@ in {
         description = ''
           Names and initialization script contents for additional
           packages to load.
-          '';
+        '';
       };
 
       global_config = mkOption {
@@ -69,16 +88,16 @@ in {
         default = {};
         description = ''
           Associate settings with major modes, names are major modes, and
-          configuration settings are applied as mode hooks.         
+          configuration settings are applied as mode hooks.
         '';
       };
-      
+
       extra_els = mkOption {
         type = attrsOf path;
         description = ''
           Paths of .el libraries to copy to .emacs.d/lisp and load.
           The attribute names must be the library names to require.
-          '';
+        '';
         default = {};
       };
 
@@ -127,7 +146,7 @@ in {
         type = str;
         default = "";
       };
-      
+
       user_config = mkOption {
         description = ''
           Configuration for user code:
@@ -142,101 +161,227 @@ in {
 
       custom_colors = mkOption {
         description = ''
-          
+
         '';
         default = {};
         type = types.submodule {
           options = {
-            act1 = mkOption { type = colorType; default = null;
-                              description = "One of mode-line's active colors.";};
-            act2 = mkOption { type = colorType; default = null;
-                              description = "The other active color of mode-line.";};
-            base = mkOption { type = colorType; default = null;
-                              description = "The basic color of normal text.";};
-            base-dim = mkOption { type = colorType; default = null;
-                                  description = "A dimmer version of the normal text color.";};
-            bg1 = mkOption { type = colorType; default = null;
-                             description = "The background color.";};
-            bg2 = mkOption { type = colorType; default = null;
-                             description =
-                               "A darker background color. Used to highlight current line.";};
-            bg3 = mkOption { type = colorType; default = null;
-                             description = "Yet another darker shade of the background color.";};
-            bg4 = mkOption { type = colorType; default = null;
-                             description = "The darkest background color.";};
-            border = mkOption { type = colorType; default = null;
-                                description = "A border line color. Used in mode-line borders.";};
-            cblk = mkOption { type = colorType; default = null;
-                              description = "A code block color. Used in org's code blocks.";};
-            cblk-bg = mkOption { type = colorType; default = null;
-                                 description = "The background color of a code block.";};
-            cblk-ln = mkOption { type = colorType; default = null;
-                                 description = "A code block header line.";};
-            cblk-ln-bg = mkOption { type = colorType; default = null;
-                                    description = "The background of a code block header line.";};
-            cursor = mkOption { type = colorType; default = null;
-                                description = "The cursor/point color.";};
-            const = mkOption { type = colorType; default = null;
-                               description = "A constant.";};
-            comment = mkOption { type = colorType; default = null;
-                                 description = "A comment.";};
-            comment-bg = mkOption { type = colorType; default = null;
-                                    description = "The background color of a comment.";};
-            comp = mkOption { type = colorType; default = null;
-                              description = "A complementary color.";};
-            err = mkOption { type = colorType; default = null;
-                             description = "errors.";};
-            func = mkOption { type = colorType; default = null;
-                              description = "functions.";};
-            head1 = mkOption { type = colorType; default = null;
-                               description = "Level 1 of a heading. Used in org's headings.";};
-            head1-bg = mkOption { type = colorType; default = null;
-                                  description = "The background of level 1 headings.";};
-            head2 = mkOption { type = colorType; default = null;
-                               description = "Level 2 headings.";};
-            head2-bg = mkOption { type = colorType; default = null;
-                                  description = "Level 2 headings background.";};
-            head3 = mkOption { type = colorType; default = null;
-                               description = "Level 3 headings.";};
-            head3-bg = mkOption { type = colorType; default = null;
-                                  description = "Level 3 headings background.";};
-            head4 = mkOption { type = colorType; default = null;
-                               description = "Level 4 headings.";};
-            head4-bg = mkOption { type = colorType; default = null;
-                                  description = "Level 4 headings background.";};
-            highlight = mkOption { type = colorType; default = null;
-                                   description = "A highlighted area.";};
-            highlight-dim = mkOption { type = colorType; default = null;
-                                       description = "A dimmer highlighted area.";};
-            keyword = mkOption { type = colorType; default = null;
-                                 description = "A keyword or a builtin color.";};
-            lnum = mkOption { type = colorType; default = null;
-                              description = "Line numbers.";};
-            mat = mkOption { type = colorType; default = null;
-                             description = "A matched color. Used in matching parens," +
-                                           " brackets and tags.";};
-            meta = mkOption { type = colorType; default = null;
-                              description = "A meta line. Used in org's meta line.";};
-            str = mkOption { type = colorType; default = null;
-                             description = "A string.";};
-            suc = mkOption { type = colorType; default = null;
-                             description = "To indicate success. Opposite of error.";};
-            ttip = mkOption { type = colorType; default = null;
-                              description = "Tooltip color.";};
-            ttip-sl = mkOption { type = colorType; default = null;
-                                 description = "Tooltip selection color.";};
-            ttip-bg = mkOption { type = colorType; default = null;
-                                 description = "Tooltip background color.";};
-            type = mkOption { type = colorType; default = null;
-                              description = "A type color.";};
-            var = mkOption { type = colorType; default = null;
-                             description = "A variable color.";};
-            war = mkOption { type = colorType; default = null;
-                             description = "A warning color.";};
+            act1 = mkOption {
+              type = colorType;
+              default = null;
+              description = "One of mode-line's active colors.";
+            };
+            act2 = mkOption {
+              type = colorType;
+              default = null;
+              description = "The other active color of mode-line.";
+            };
+            base = mkOption {
+              type = colorType;
+              default = null;
+              description = "The basic color of normal text.";
+            };
+            base-dim = mkOption {
+              type = colorType;
+              default = null;
+              description = "A dimmer version of the normal text color.";
+            };
+            bg1 = mkOption {
+              type = colorType;
+              default = null;
+              description = "The background color.";
+            };
+            bg2 = mkOption {
+              type = colorType;
+              default = null;
+              description = "A darker background color. Used to highlight current line.";
+            };
+            bg3 = mkOption {
+              type = colorType;
+              default = null;
+              description = "Yet another darker shade of the background color.";
+            };
+            bg4 = mkOption {
+              type = colorType;
+              default = null;
+              description = "The darkest background color.";
+            };
+            border = mkOption {
+              type = colorType;
+              default = null;
+              description = "A border line color. Used in mode-line borders.";
+            };
+            cblk = mkOption {
+              type = colorType;
+              default = null;
+              description = "A code block color. Used in org's code blocks.";
+            };
+            cblk-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "The background color of a code block.";
+            };
+            cblk-ln = mkOption {
+              type = colorType;
+              default = null;
+              description = "A code block header line.";
+            };
+            cblk-ln-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "The background of a code block header line.";
+            };
+            cursor = mkOption {
+              type = colorType;
+              default = null;
+              description = "The cursor/point color.";
+            };
+            const = mkOption {
+              type = colorType;
+              default = null;
+              description = "A constant.";
+            };
+            comment = mkOption {
+              type = colorType;
+              default = null;
+              description = "A comment.";
+            };
+            comment-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "The background color of a comment.";
+            };
+            comp = mkOption {
+              type = colorType;
+              default = null;
+              description = "A complementary color.";
+            };
+            err = mkOption {
+              type = colorType;
+              default = null;
+              description = "errors.";
+            };
+            func = mkOption {
+              type = colorType;
+              default = null;
+              description = "functions.";
+            };
+            head1 = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 1 of a heading. Used in org's headings.";
+            };
+            head1-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "The background of level 1 headings.";
+            };
+            head2 = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 2 headings.";
+            };
+            head2-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 2 headings background.";
+            };
+            head3 = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 3 headings.";
+            };
+            head3-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 3 headings background.";
+            };
+            head4 = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 4 headings.";
+            };
+            head4-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "Level 4 headings background.";
+            };
+            highlight = mkOption {
+              type = colorType;
+              default = null;
+              description = "A highlighted area.";
+            };
+            highlight-dim = mkOption {
+              type = colorType;
+              default = null;
+              description = "A dimmer highlighted area.";
+            };
+            keyword = mkOption {
+              type = colorType;
+              default = null;
+              description = "A keyword or a builtin color.";
+            };
+            lnum = mkOption {
+              type = colorType;
+              default = null;
+              description = "Line numbers.";
+            };
+            mat = mkOption {
+              type = colorType;
+              default = null;
+              description =
+                "A matched color. Used in matching parens,"
+                + " brackets and tags.";
+            };
+            meta = mkOption {
+              type = colorType;
+              default = null;
+              description = "A meta line. Used in org's meta line.";
+            };
+            str = mkOption {
+              type = colorType;
+              default = null;
+              description = "A string.";
+            };
+            suc = mkOption {
+              type = colorType;
+              default = null;
+              description = "To indicate success. Opposite of error.";
+            };
+            ttip = mkOption {
+              type = colorType;
+              default = null;
+              description = "Tooltip color.";
+            };
+            ttip-sl = mkOption {
+              type = colorType;
+              default = null;
+              description = "Tooltip selection color.";
+            };
+            ttip-bg = mkOption {
+              type = colorType;
+              default = null;
+              description = "Tooltip background color.";
+            };
+            type = mkOption {
+              type = colorType;
+              default = null;
+              description = "A type color.";
+            };
+            var = mkOption {
+              type = colorType;
+              default = null;
+              description = "A variable color.";
+            };
+            war = mkOption {
+              type = colorType;
+              default = null;
+              description = "A warning color.";
+            };
           };
         };
       };
-      
+
       dotspacemacs_options = mkOption {
         description = "spacemacs native options";
         default = {};
@@ -977,7 +1122,8 @@ in {
     home.file = mkMerge [
       (attrsets.mapAttrs' (name: value:
         nameValuePair (".emacs.d/lisp/" + name + ".el")
-          ({source = value;})) cfg.extra_els)
+        {source = value;})
+      cfg.extra_els)
       {
         ".emacs.d" = {
           recursive = true;
@@ -995,172 +1141,267 @@ in {
             name = ".spacemacs";
             text = let
               indent = count: (
-                concatStrings (replicate count " "));
+                concatStrings (replicate count " ")
+              );
               layer_var_acc = acc: name: value: (
-                acc + "\n" + (indent 7) + name + " " + value);
+                acc + "\n" + (indent 7) + name + " " + value
+              );
               layer_acc = acc: name: value: (
-                acc + "\n" + (indent 5) + "(" + name +
-                ( attrsets.foldlAttrs layer_var_acc " :variables" value.variables) + ")");
+                acc
+                + "\n"
+                + (indent 5)
+                + "("
+                + name
+                + (attrsets.foldlAttrs layer_var_acc " :variables" value.variables)
+                + ")"
+              );
               option_acc = acc: name: value: (
-                acc + "\n" + (indent 3) + "dotspacemacs-" + name + " " + value);
+                acc + "\n" + (indent 3) + "dotspacemacs-" + name + " " + value
+              );
               packages_string = (
                 strings.optionalString (cfg.extra_packages != {})
-                  ((indent 3) + "dotspacemacs-additional-packages '(use-package\n"
-                   + (indent 38)
-                   + (strings.concatStringsSep ("\n" + indent 38)
-                      (attrNames cfg.extra_packages))
-                   + ")\n"));
+                ((indent 3)
+                  + "dotspacemacs-additional-packages '(use-package\n"
+                  + (indent 38)
+                  + (strings.concatStringsSep ("\n" + indent 38)
+                    (attrNames cfg.extra_packages))
+                  + ")\n")
+              );
               color_acc = acc: name: value: (
-                acc + "\n" + (indent 28) + "(" + name + " . " +
-                (if value == "nil" then "nil" else "\"" + value + "\"") +
-                ")");
-              custom_colors_to_use = attrsets.filterAttrs (
-                name: value: value != null) cfg.custom_colors;
-              custom_set_colors = if (custom_colors_to_use != {})
-                                  then
-                                    ((indent 2) +
-                                     "(custom-set-variables '(spacemacs-theme-custom-colors\n" +
-                                     (indent 26) + "'(" +
-                                     (attrsets.foldlAttrs color_acc "" custom_colors_to_use) + ")))\n")
-                                  else
-                                    "";
+                acc
+                + "\n"
+                + (indent 28)
+                + "("
+                + name
+                + " . "
+                + (
+                  if value == "nil"
+                  then "nil"
+                  else "\"" + value + "\""
+                )
+                + ")"
+              );
+              custom_colors_to_use =
+                attrsets.filterAttrs (
+                  name: value: value != null
+                )
+                cfg.custom_colors;
+              custom_set_colors =
+                if (custom_colors_to_use != {})
+                then
+                  ((indent 2)
+                    + "(custom-set-variables '(spacemacs-theme-custom-colors\n"
+                    + (indent 26)
+                    + "'("
+                    + (attrsets.foldlAttrs color_acc "" custom_colors_to_use)
+                    + ")))\n")
+                else "";
               require_acc = acc: name: value: (
-                acc + "\n" + (indent 2) + "(require '" + name + ")");
-              custom_el_config = (attrsets.foldlAttrs require_acc "" cfg.extra_els)
-                                 + "\n";
-              create_variable_sets = varsets: spacing:
-                (attrsets.foldlAttrs
-                  (acc: name: value: acc + "\n" + (indent spacing) +
-                                   "(setq " + name + " " + value + ")" )
-                "" varsets);
-              create_remove_keybindings = remkeys: spacing:
-                (strings.concatStringsSep ("\n" + indent spacing)
-                  (lists.forEach remkeys
-                    (s: "(global-unset-key (kbd \"" + s + "\"))")));
-              create_add_keybindings = addkeys: spacing:
-                (attrsets.foldlAttrs
-                  (acc: name: value: acc + "\n" + (indent spacing) +
-                                   "(global-set-key (kbd \"" + name +
-                                   "\") " + value + ")" )
-                 "" addkeys);
-              create_local_remove_keybindings = remkeys: spacing:
-                (strings.concatStringsSep ("\n" + indent spacing)
-                  (lists.forEach remkeys
-                    (s: "(local-unset-key (kbd \"" + s + "\"))")));
-              create_local_add_keybindings = addkeys: spacing:
-                (attrsets.foldlAttrs
-                  (acc: name: value: acc + "\n" + (indent spacing) +
-                                   "(local-set-key (kbd \"" + name +
-                                   "\") " + value + ")" )
-                 "" addkeys);
-            in ''
-             (defun dotspacemacs/layers ()
-               "Layer configuration"
-               (setq-default
-                dotspacemacs-distribution 'spacemacs-base
-                dotspacemacs-enable-lazy-installation 'unused
-                dotspacemacs-ask-for-lazy-installation t
-                dotspacemacs-configuration-layer-path '()
-                dotspacemacs-configuration-layers
-                '(
-             '' + (attrsets.foldlAttrs layer_acc "" cfg.layers) + ")\n"
-            +  packages_string + ''
-             
-                dotspacemacs-frozen-packages '()
-                dotspacemacs-excluded-packages '()
-                dotspacemacs-install-packages 'used-only))
-             
-             (defun dotspacemacs/init ()
-               (setq-default
-             '' +
-            (attrsets.foldlAttrs option_acc "" cfg.dotspacemacs_options) +
-            "))\n\n" + cfg.extra_functions +
-            "\n(defun dotspacemacs/user-env ()\n" +
-            cfg.user_env + "\n" + (indent 2) +
-            "(spacemacs/load-spacemacs-env))\n" +
-            "\n(defun dotspacemacs/user-init ()\n" +
-              custom_set_colors + "\n" + (indent 2) +
-              "(add-to-list 'load-path \"" +  config.home.homeDirectory +
-              "/.emacs.d/lisp/\")\n" + (indent 2) +
+                acc + "\n" + (indent 2) + "(require '" + name + ")"
+              );
+              custom_el_config =
+                (attrsets.foldlAttrs require_acc "" cfg.extra_els)
+                + "\n";
+              create_variable_sets = varsets: spacing: (attrsets.foldlAttrs
+                (acc: name: value:
+                  acc
+                  + "\n"
+                  + (indent spacing)
+                  + "(setq "
+                  + name
+                  + " "
+                  + value
+                  + ")")
+                ""
+                varsets);
+              create_remove_keybindings = remkeys: spacing: (strings.concatStringsSep ("\n" + indent spacing)
+                (lists.forEach remkeys
+                  (s: "(global-unset-key (kbd \"" + s + "\"))")));
+              create_add_keybindings = addkeys: spacing: (attrsets.foldlAttrs
+                (acc: name: value:
+                  acc
+                  + "\n"
+                  + (indent spacing)
+                  + "(global-set-key (kbd \""
+                  + name
+                  + "\") "
+                  + value
+                  + ")")
+                ""
+                addkeys);
+              create_local_remove_keybindings = remkeys: spacing: (strings.concatStringsSep ("\n" + indent spacing)
+                (lists.forEach remkeys
+                  (s: "(local-unset-key (kbd \"" + s + "\"))")));
+              create_local_add_keybindings = addkeys: spacing: (attrsets.foldlAttrs
+                (acc: name: value:
+                  acc
+                  + "\n"
+                  + (indent spacing)
+                  + "(local-set-key (kbd \""
+                  + name
+                  + "\") "
+                  + value
+                  + ")")
+                ""
+                addkeys);
+            in
+              ''
+                (defun dotspacemacs/layers ()
+                  "Layer configuration"
+                  (setq-default
+                   dotspacemacs-distribution 'spacemacs-base
+                   dotspacemacs-enable-lazy-installation 'unused
+                   dotspacemacs-ask-for-lazy-installation t
+                   dotspacemacs-configuration-layer-path '()
+                   dotspacemacs-configuration-layers
+                   '(
+              ''
+              + (attrsets.foldlAttrs layer_acc "" cfg.layers)
+              + ")\n"
+              + packages_string
+              + ''
+
+                   dotspacemacs-frozen-packages '()
+                   dotspacemacs-excluded-packages '()
+                   dotspacemacs-install-packages 'used-only))
+
+                (defun dotspacemacs/init ()
+                  (setq-default
+              ''
+              + (attrsets.foldlAttrs option_acc "" cfg.dotspacemacs_options)
+              + "))\n\n"
+              + cfg.extra_functions
+              + "\n(defun dotspacemacs/user-env ()\n"
+              + cfg.user_env
+              + "\n"
+              + (indent 2)
+              + "(spacemacs/load-spacemacs-env))\n"
+              + "\n(defun dotspacemacs/user-init ()\n"
+              + custom_set_colors
+              + "\n"
+              + (indent 2)
+              + "(add-to-list 'load-path \""
+              + config.home.homeDirectory
+              + "/.emacs.d/lisp/\")\n"
+              + (indent 2)
+              +
               # extra package init contents
               builtins.replaceStrings ["\n"] [("\n" + indent 2)]
               (strings.concatStringsSep "\n"
-                 (attrsets.mapAttrsToList
-                   (name: value: value.init)
-                   cfg.extra_packages)) +
-              cfg.user_init + ")\n" +
-            "\n(defun dotspacemacs/user-load ()\n" +
-              cfg.user_load + ")\n" +
-            "\n(defun dotspacemacs/user-config  ()\n" + (indent 2) +
+                (attrsets.mapAttrsToList
+                  (name: value: value.init)
+                  cfg.extra_packages))
+              + cfg.user_init
+              + ")\n"
+              + "\n(defun dotspacemacs/user-load ()\n"
+              + cfg.user_load
+              + ")\n"
+              + "\n(defun dotspacemacs/user-config  ()\n"
+              + (indent 2)
+              +
               # extra package conf contents
               builtins.replaceStrings ["\n"] [("\n" + indent 2)]
-                (strings.concatStringsSep "\n"
-                   (attrsets.mapAttrsToList
-                     (name: value: value.config)
-                     cfg.extra_packages)) + "\n" + (indent 2) +
+              (strings.concatStringsSep "\n"
+                (attrsets.mapAttrsToList
+                  (name: value: value.config)
+                  cfg.extra_packages))
+              + "\n"
+              + (indent 2)
+              +
               # variable sets
-              (create_variable_sets cfg.global_config.set_variables 2) +
-              "\n" + (indent 2) + 
+              (create_variable_sets cfg.global_config.set_variables 2)
+              + "\n"
+              + (indent 2)
+              +
               # keybinding removal
-              (create_remove_keybindings cfg.global_config.remove_keybindings 2) +
-              "\n" + (indent 2) + 
+              (create_remove_keybindings cfg.global_config.remove_keybindings 2)
+              + "\n"
+              + (indent 2)
+              +
               # keybinding additions
-              (create_add_keybindings cfg.global_config.keybindings 2) +
-              "\n" + (indent 2) +
-              (builtins.replaceStrings ["\n"] [("\n" + indent 2)]
-               cfg.global_config.extra_config) + "\n" + (indent 2) +
+              (create_add_keybindings cfg.global_config.keybindings 2)
+              + "\n"
+              + (indent 2)
+              + (builtins.replaceStrings ["\n"] [("\n" + indent 2)]
+                cfg.global_config.extra_config)
+              + "\n"
+              + (indent 2)
+              +
               # modal configs
               (attrsets.foldlAttrs
                 (acc: name: value:
-                  acc + "\n" + (indent 2) +
-                  "(add-hook '" + name + "-hook\n" + (indent 4) +
-                  "'(lambda ()\n" + (indent 6) + "(" +
-                  (create_variable_sets value.set_variables 6) +
-                  "\n" + (indent 6) +
-                  (create_local_remove_keybindings value.remove_keybindings 6) +
-                  "\n" + (indent 6) +
-                  (create_local_add_keybindings value.keybindings 6) +
-                  "\n" + (indent 6) +
-                  (builtins.replaceStrings ["\n"]  [("\n" + indent 6)]
+                  acc
+                  + "\n"
+                  + (indent 2)
+                  + "(add-hook '"
+                  + name
+                  + "-hook\n"
+                  + (indent 4)
+                  + "'(lambda ()\n"
+                  + (indent 6)
+                  + "("
+                  + (create_variable_sets value.set_variables 6)
+                  + "\n"
+                  + (indent 6)
+                  + (create_local_remove_keybindings value.remove_keybindings 6)
+                  + "\n"
+                  + (indent 6)
+                  + (create_local_add_keybindings value.keybindings 6)
+                  + "\n"
+                  + (indent 6)
+                  + (builtins.replaceStrings ["\n"] [("\n" + indent 6)]
                     value.extra_config)
                   + ")))\n")
-                "" cfg.modal_config) +
-              custom_el_config +
-              cfg.user_config + ")\n" +
-            "\n(defun dotspacemacs/emacs-custom-settings ())\n";
+                ""
+                cfg.modal_config)
+              + custom_el_config
+              + cfg.user_config
+              + ")\n"
+              + "\n(defun dotspacemacs/emacs-custom-settings ())\n";
           };
         };
       }
     ];
-    home.packages = with pkgs; with lib;
+    home.packages = with pkgs;
+    with lib;
       mkIf (attrsets.hasAttrByPath ["lsp"] cfg.layers) (
         let
-          cpp_backend = (attrsets.attrByPath
-            ["c-c++" "variables" "c-c++-backend"] "" cfg.layers);
-          python_backend = if (attrsets.hasAttrByPath ["python"] cfg.layers)
-            then (attrsets.attrByPath["python" "variables" "python-lsp-server"]
-                  "'pylsp")
-              else  "";
+          cpp_backend =
+            attrsets.attrByPath
+            ["c-c++" "variables" "c-c++-backend"] ""
+            cfg.layers;
+          python_backend =
+            if (attrsets.hasAttrByPath ["python"] cfg.layers)
+            then
+              (attrsets.attrByPath ["python" "variables" "python-lsp-server"]
+                "'pylsp")
+            else "";
         in
           mkMerge [
             (mkIf (cpp_backend == "'lsp-ccls") [ccls])
             (mkIf (cpp_backend == "'lsp-clangd") [libclang])
             (mkIf
-              ((attrsets.attrByPath ["nixos" "variables" "nix-backend" ] "" cfg.layers)
-               == "'lsp")
-              [(builtins.getFlake "github:nix-community/rnix-lsp/95d40673fe43642e2e1144341e86d0036abd95d9").packages."${system}".rnix-lsp ])
+              ((attrsets.attrByPath ["nixos" "variables" "nix-backend"] "" cfg.layers)
+                == "'lsp")
+              [(builtins.getFlake "github:nix-community/rnix-lsp/95d40673fe43642e2e1144341e86d0036abd95d9").packages."${system}".rnix-lsp])
             (mkIf (attrsets.hasAttrByPath ["rust"] cfg.layers) [rust-analyzer clippy rustfmt])
           ]
       );
-    python_manager.python_packages = with pkgs; with lib;
+    python_manager.python_packages = with pkgs;
+    with lib;
       mkIf (attrsets.hasAttrByPath ["lsp"] cfg.layers) (
-        let python_backend = if (attrsets.hasAttrByPath ["python"] cfg.layers)
-          then (attrsets.attrByPath["python" "variables" "python-lsp-server"]
-                "'pylsp" cfg.layers.python)
-          else  "";
+        let
+          python_backend =
+            if (attrsets.hasAttrByPath ["python"] cfg.layers)
+            then
+              (attrsets.attrByPath ["python" "variables" "python-lsp-server"]
+                "'pylsp"
+                cfg.layers.python)
+            else "";
         in
           mkMerge [
-      (mkIf (python_backend == "'pylsp") ["python-lsp-server"])
-      ]);
+            (mkIf (python_backend == "'pylsp") ["python-lsp-server"])
+          ]
+      );
   };
 }

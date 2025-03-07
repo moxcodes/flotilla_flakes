@@ -1,14 +1,15 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
-
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./surface_go_hardware_configuration.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./surface_go_hardware_configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -56,12 +57,11 @@
     };
   };
 
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mox = {
     isNormalUser = true;
     description = "jordan";
-    extraGroups = [ "docker" "networkmanager" "video" "wheel" "disk" ];
+    extraGroups = ["docker" "networkmanager" "video" "wheel" "disk"];
     shell = pkgs.fish;
     packages = with pkgs; [];
   };
@@ -114,6 +114,7 @@
     battery = {
       governor = "powersave";
       turbo = "never";
+      scaling_max_freq = "500000";
     };
     charger = {
       governor = "performance";
@@ -142,20 +143,24 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-   hardware.graphics.enable = true;
+  hardware.graphics.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
   virtualisation.docker.enable = true;
 
+  nix.settings.experimental-features = ["nix-command" "flakes"];
+
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
     # Syncthing ports (gui and sync protocol) - for mox
-    8384 22000
+    8384
+    22000
   ];
   networking.firewall.allowedUDPPorts = [
     # Syncthing ports (sync protocol) - for mox
-    22000 21027
+    22000
+    21027
   ];
 
   # This value determines the NixOS release from which the default
@@ -165,5 +170,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }

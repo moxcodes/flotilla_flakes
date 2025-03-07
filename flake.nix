@@ -9,25 +9,42 @@
   inputs.home-manager.url = "github:nix-community/home-manager";
   inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-  outputs = {nixpkgs, home-manager, sops-nix, self}@inputs: {
-
+  outputs = {
+    nixpkgs,
+    home-manager,
+    sops-nix,
+    self,
+  } @ inputs: let
+    supportedSystems = ["x86_64-linux"];
+    forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+  in {
+    formatter = forAllSystems (system: let
+      pkgs = import nixpkgs {inherit system;};
+    in
+      pkgs.alejandra);
     nixosConfigurations = {
       rocinante = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./configuration.nix
-            sops-nix.nixosModules.sops
-            (import ./users
-                    { home_manager_path = home-manager.outPath; sysname = "ares"; })
-          ];
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          sops-nix.nixosModules.sops
+          (import ./users
+            {
+              home_manager_path = home-manager.outPath;
+              sysname = "ares";
+            })
+        ];
       };
       ares = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./surface_go_configuration.nix
-            (import ./users
-                    { home_manager_path = home-manager.outPath; sysname = "ares"; })
-          ];
+        system = "x86_64-linux";
+        modules = [
+          ./surface_go_configuration.nix
+          (import ./users
+            {
+              home_manager_path = home-manager.outPath;
+              sysname = "ares";
+            })
+        ];
       };
     };
   };

@@ -1,6 +1,8 @@
-{custom}:
-{config, pkgs, ...}:
-let
+{custom}: {
+  config,
+  pkgs,
+  ...
+}: let
   configure-gtk = pkgs.writeTextFile {
     name = "configure-gtk";
     destination = "/bin/configure-gtk";
@@ -18,10 +20,13 @@ let
       gsettings set $gnome_schema monospace-font-name 'InconsolataNerdFont 8'
     '';
   };
-in
-{
-  imports = [ ./modules/gitmux.nix ./modules/spacemacs.nix ./modules/python_manager.nix];
-  python_manager =  with pkgs; {
+in {
+  imports = [
+    ./modules/gitmux.nix
+    ./modules/spacemacs.nix
+    ./modules/python_manager.nix
+  ];
+  python_manager = with pkgs; {
     enable = true;
     python = python3;
     python_packages = [
@@ -35,8 +40,7 @@ in
       "websocket-client"
     ];
   };
-  home.packages = with pkgs;
-  [
+  home.packages = with pkgs; [
     age
     android-tools
     awscli2
@@ -87,7 +91,7 @@ in
     wlr-randr
     zathura
     zoom-us
-    (callPackage ./deriv/multibg-sway { })
+    (callPackage ./deriv/multibg-sway {})
   ];
 
   home.username = "mox";
@@ -157,14 +161,17 @@ in
       foreground = "#00dd00";
     };
     extraConfig = ''
-    symbol_map U+E0A0-U+E0A3,U+E0C0-U+E0C7 PowerlineSymbols
-    symbol_map U+23FB-U+2B58,U+E000-U+EBFF,U+F000-U+FD46,U+F0000-U+F0FFF SymbolsNF
-    map kitty_mod+equal change_font_size all +1.0
-    map kitty_mod+minus change_font_size all -1.0
+      symbol_map U+E0A0-U+E0A3,U+E0C0-U+E0C7 PowerlineSymbols
+      symbol_map U+23FB-U+2B58,U+E000-U+EBFF,U+F000-U+FD46,U+F0000-U+F0FFF SymbolsNF
+      map kitty_mod+equal change_font_size all +1.0
+      map kitty_mod+minus change_font_size all -1.0
     '';
   };
 
-  programs.tmux = (import ./programs/tmux.nix {config=config; pkgs=pkgs;});
+  programs.tmux = import ./programs/tmux.nix {
+    config = config;
+    pkgs = pkgs;
+  };
   programs.gitmux = {
     enable = true;
     styles.clear = "#[fg=white]";
@@ -268,10 +275,10 @@ in
       "xclip" = {
         config = ''
           (xclip-mode 1)
-        '';      
+        '';
       };
     };
-    extra_functions = (builtins.readFile ./spacemacs_extras/extra_functions.el);
+    extra_functions = builtins.readFile ./spacemacs_extras/extra_functions.el;
     extra_els = {
       google-c-style = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/google/styleguide/8487c083e1faecb1259be8a8873618cfdb69d33d/google-c-style.el";
@@ -279,14 +286,36 @@ in
       };
     };
     global_config = {
-      remove_keybindings = ["<left>" "<right>" "<up>" "<down>"
-                            "C-<left>" "C-<right>" "C-<up>" "C-<down>" "M-;" "M-c"
-                            "C-?" "M-." "M-TAB" "C-i" "M-s" "M-j" "M-i" "M-o"
-                            "M-I" "M-O"];
+      remove_keybindings = [
+        "<left>"
+        "<right>"
+        "<up>"
+        "<down>"
+        "C-<left>"
+        "C-<right>"
+        "C-<up>"
+        "C-<down>"
+        "M-;"
+        "M-c"
+        "C-?"
+        "M-."
+        "M-TAB"
+        "C-i"
+        "M-s"
+        "M-j"
+        "M-i"
+        "M-o"
+        "M-I"
+        "M-O"
+      ];
       keybindings = {
+        "<down>" = "'backward-paragraph";
         "M-n" = "'forward-paragraph";
+        "<up>" = "'backward-paragraph";
         "M-p" = "'backward-paragraph";
+        "<right>" = "'forward-to-separator";
         "M-f" = "'forward-to-separator";
+        "<left>" = "'forward-to-separator";
         "M-b" = "'backward-to-separator";
         "M-P" = "(lambda () (interactive) (previous-line 5))";
         "M-N" = "(lambda () (interactive) (next-line 5))";
@@ -301,7 +330,8 @@ in
         "M-o" = "'forward-local-mark";
         "M-I" = "'backward-global-mark";
         "M-O" = "'forward-global-mark";
-        "M-TAB" = "'lsp-format-region";
+        "M-TAB" = "'lsp-format-buffer";
+        "TAB" = "'lsp-format-region";
         "M-q" = "'fill-sentence";
         "C-?" = "'help-command";
       };
@@ -398,84 +428,84 @@ in
       mx = "emacsclient -nw $argv";
     };
     shellInit = ''
-set -g EDITOR "emacsclient -nw"
-if test -n "$DEVSHELL"
-else
-  set -x DEVSHELL ""
-  set -x DEVSHELL_ICON ""
-end
-set -U fish_greeting ""
-# handy function from projekt0n/biscuit
-set right_segment_separator "▕"
-set left_segment_separator "▏"
-function prompt_segment -d "Function to draw a segment"
-  set -l bg
-  set -l fg
-  if [ -n "$argv[2]" ]
-    set bg $argv[2]
-  else
-    set bg normal
-  end
-  if [ -n "$argv[3]" ]
-    set fg $argv[3]
-  else
-    set fg normal
-  end
+      set -g EDITOR "emacsclient -nw"
+      if test -n "$DEVSHELL"
+      else
+        set -x DEVSHELL ""
+        set -x DEVSHELL_ICON ""
+      end
+      set -U fish_greeting ""
+      # handy function from projekt0n/biscuit
+      set right_segment_separator "▕"
+      set left_segment_separator "▏"
+      function prompt_segment -d "Function to draw a segment"
+        set -l bg
+        set -l fg
+        if [ -n "$argv[2]" ]
+          set bg $argv[2]
+        else
+          set bg normal
+        end
+        if [ -n "$argv[3]" ]
+          set fg $argv[3]
+        else
+          set fg normal
+        end
 
-  set -l sep_col (set_color $argv[1] -b $bg)
-  set -l txt_col (set_color -o $fg -b $bg)
-  set -l normal (set_color normal)
+        set -l sep_col (set_color $argv[1] -b $bg)
+        set -l txt_col (set_color -o $fg -b $bg)
+        set -l normal (set_color normal)
 
-  set -l lsep $sep_col $left_segment_separator
-  set -l rsep $sep_col $right_segment_separator
+        set -l lsep $sep_col $left_segment_separator
+        set -l rsep $sep_col $right_segment_separator
 
-  if [ -n "$argv[4]" ]
-    set -l data  $txt_col $argv[4] $normal
-    echo -n -s $lsep $data $rsep
-  end
-  set_color normal -b normal
-end
-function fish_prompt
-  set -l this_status $status
-  set -l color white
-  if test $this_status -eq 1
-    set color ff31aa
-  else if test $this_status -ge 126 && test $this_status -le 127
-    set color ff8700
-  else if test $this_status -eq 130
-    set color ffec00
-  else if test $this_status -ge 128
-    set color cc00ff
-  else if test $this_status -ge 1
-    set color ff0000
-  else
-    set color white
-  end
-  prompt_segment $color 222 green (prompt_hostname)
-  echo -n $DEVSHELL_ICON
-  echo -n " "
-  prompt_segment $color 222 cyan (date '+%H:%M:%S')
-  echo -n " "
-end
-function fish_right_prompt
-  set -l this_status $status
-  set -l color white
-  if test $this_status -eq 1
-    set color ff31aa
-  else if test $this_status -ge 126 && test $this_status -le 127
-    set color ff8700
-  else if test $this_status -eq 130
-    set color ffec00
-  else if test $this_status -ge 128
-    set color cc00ff
-  else if test $this_status -ge 1
-    set color ff0000
-  else
-    set color white
-  end
-  prompt_segment $color 222 red (prompt_pwd)
-end
-  set_color
+        if [ -n "$argv[4]" ]
+          set -l data  $txt_col $argv[4] $normal
+          echo -n -s $lsep $data $rsep
+        end
+        set_color normal -b normal
+      end
+      function fish_prompt
+        set -l this_status $status
+        set -l color white
+        if test $this_status -eq 1
+          set color ff31aa
+        else if test $this_status -ge 126 && test $this_status -le 127
+          set color ff8700
+        else if test $this_status -eq 130
+          set color ffec00
+        else if test $this_status -ge 128
+          set color cc00ff
+        else if test $this_status -ge 1
+          set color ff0000
+        else
+          set color white
+        end
+        prompt_segment $color 222 green (prompt_hostname)
+        echo -n $DEVSHELL_ICON
+        echo -n " "
+        prompt_segment $color 222 cyan (date '+%H:%M:%S')
+        echo -n " "
+      end
+      function fish_right_prompt
+        set -l this_status $status
+        set -l color white
+        if test $this_status -eq 1
+          set color ff31aa
+        else if test $this_status -ge 126 && test $this_status -le 127
+          set color ff8700
+        else if test $this_status -eq 130
+          set color ffec00
+        else if test $this_status -ge 128
+          set color cc00ff
+        else if test $this_status -ge 1
+          set color ff0000
+        else
+          set color white
+        end
+        prompt_segment $color 222 red (prompt_pwd)
+      end
+        set_color
     '';
     plugins = [
       {
@@ -560,8 +590,8 @@ end
           "eDP-1"
           "HDMI-A-1"
         ];
-        modules-left = [ "sway/workspaces" ];
-        modules-right = [ "clock" "battery" ];
+        modules-left = ["sway/workspaces"];
+        modules-right = ["clock" "battery"];
         modules-center = [];
         "sway/workspaces" = {
           format = "{name}{icon}";
@@ -590,30 +620,30 @@ end
       };
     };
     style = ''
-        * {
-          font-family: InconsolataNerdFont;
-          padding: 0 0;
-          margin: -2 0;
-          transition: all 0.0s ease;
-        }
+      * {
+        font-family: InconsolataNerdFont;
+        padding: 0 0;
+        margin: -2 0;
+        transition: all 0.0s ease;
+      }
 
-        #workspaces {
-          padding: 0 4;
-          margin: -2 0;
-        }
-        #workspaces button {
-          padding: 0 0;
-          margin: -2 -1;
-          box-shadow: inset 0px 9px 0px 1px #008800,
-                      inset 0px -9px 0px 1px #008800;
-        }
-        #workspacesB button.visible {
-          padding: 0 0;
-          margin: -2 -1;
-          color: #00ff00;
-          box-shadow: inset 0px 9px 0px 1px #00ff00,
-                      inset 0px -9px 0px 1px #00ff00;
-        }
+      #workspaces {
+        padding: 0 4;
+        margin: -2 0;
+      }
+      #workspaces button {
+        padding: 0 0;
+        margin: -2 -1;
+        box-shadow: inset 0px 9px 0px 1px #008800,
+                    inset 0px -9px 0px 1px #008800;
+      }
+      #workspacesB button.visible {
+        padding: 0 0;
+        margin: -2 -1;
+        color: #00ff00;
+        box-shadow: inset 0px 9px 0px 1px #00ff00,
+                    inset 0px -9px 0px 1px #00ff00;
+      }
     '';
   };
 
@@ -632,21 +662,21 @@ end
     tmux_continuum = {
       Unit = {
         Description = "tmux default session (detached)";
-        Documentation = [ "man:tmux(1)" ];
+        Documentation = ["man:tmux(1)"];
         # lists are duplicate keys
-        After = [ "emacs.service" "syncthing.service" ];
+        After = ["emacs.service" "syncthing.service"];
       };
       Service = {
-        ExecStart="${pkgs.tmux.outPath}/bin/tmux new-session -d ${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/restore.sh";
-        ExecStop="${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/save.sh";
-        Restart="on-failure";
-        RestartSec="5";
-        StartLimitBurst="5";
-        StartLimitIntervalSec="10";
-        SuccessExitStatus="15";
-        Type="forking";
+        ExecStart = "${pkgs.tmux.outPath}/bin/tmux new-session -d ${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/restore.sh";
+        ExecStop = "${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/save.sh";
+        Restart = "on-failure";
+        RestartSec = "5";
+        StartLimitBurst = "5";
+        StartLimitIntervalSec = "10";
+        SuccessExitStatus = "15";
+        Type = "forking";
       };
-      Install.WantedBy=[ "default.target" ];
+      Install.WantedBy = ["default.target"];
     };
   };
 
@@ -658,12 +688,24 @@ end
         genericName = "Text Editor";
         exec = "emacsclient -nw %U";
         terminal = true;
-        categories = [ "Application" "IDE" "TextTools" ];
-        mimeType = [ "text/english" "text/plain" "text/x-makefile"
-                     "text/x-c++hdr" "text/x-c++src" "text/x-chdr" "text/x-csrc"
-                     "text/x-java" "text/x-moc" "text/x-pascal" "text/x-tcl"
-                     "text/x-tex" "application/x-shellscript" "text/x-c"
-                     "text/x-c++"];
+        categories = ["Application" "IDE" "TextTools"];
+        mimeType = [
+          "text/english"
+          "text/plain"
+          "text/x-makefile"
+          "text/x-c++hdr"
+          "text/x-c++src"
+          "text/x-chdr"
+          "text/x-csrc"
+          "text/x-java"
+          "text/x-moc"
+          "text/x-pascal"
+          "text/x-tcl"
+          "text/x-tex"
+          "application/x-shellscript"
+          "text/x-c"
+          "text/x-c++"
+        ];
       };
     };
     mimeApps.enable = true;
@@ -701,7 +743,7 @@ end
       "x-scheme-handler/chrome" = "firefox.desktop";
     };
   };
-  
+
   wayland.windowManager.sway = let
     workspaceSwitchScript = pkgs.writeShellScript "workspace_switch.bash" ''
       ROWS=3
@@ -754,44 +796,45 @@ end
       modifier = "Mod4";
       keybindings = let
         mod = config.wayland.windowManager.sway.config.modifier;
-      in pkgs.lib.mkOptionDefault {
-        "${mod}+Up" = "focus up";
-        "${mod}+Down" = "focus down";
-        "${mod}+Left" = "focus left";
-        "${mod}+Right" = "focus right";
-        "${mod}+Tab" = "focus parent";
-        "${mod}+Shift+Tab" = "focus child";
+      in
+        pkgs.lib.mkOptionDefault {
+          "${mod}+Up" = "focus up";
+          "${mod}+Down" = "focus down";
+          "${mod}+Left" = "focus left";
+          "${mod}+Right" = "focus right";
+          "${mod}+Tab" = "focus parent";
+          "${mod}+Shift+Tab" = "focus child";
 
-        "${mod}+Shift+Up" = "move up";
-        "${mod}+Shift+Down" = "move down";
-        "${mod}+Shift+Left" = "move left";
-        "${mod}+Shift+Right" = "move right";
+          "${mod}+Shift+Up" = "move up";
+          "${mod}+Shift+Down" = "move down";
+          "${mod}+Shift+Left" = "move left";
+          "${mod}+Shift+Right" = "move right";
 
-        "${mod}+bar" = "split horizontal";
-        "${mod}+minus" = "split vertical";
+          "${mod}+bar" = "split horizontal";
+          "${mod}+minus" = "split vertical";
 
-        "${mod}+Shift+c" = "kill";
+          "${mod}+Shift+c" = "kill";
 
-        "${mod}+Control+Left" = "resize shrink width 20 px";
-        "${mod}+Control+Right" = "resize grow width 20 px";
-        "${mod}+Control+Up" = "resize grow height 20 px";
-        "${mod}+Control+Down" = "resize shrink height 20 px";
-        
-        "XF86MonBrightnessUp" = "exec light -A 1";
-        "XF86MonBrightnessDown" = "exec light -U 1";
-        
-        "${mod}+Alt+Up" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d up";
-        "${mod}+Alt+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d down";
-        "${mod}+Alt+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d left";
-        "${mod}+Alt+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d right";
+          "${mod}+Control+Left" = "resize shrink width 20 px";
+          "${mod}+Control+Right" = "resize grow width 20 px";
+          "${mod}+Control+Up" = "resize grow height 20 px";
+          "${mod}+Control+Down" = "resize shrink height 20 px";
 
-        "${mod}+Alt+Shift+Up" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d up";
-        "${mod}+Alt+Shift+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d down";
-        "${mod}+Alt+Shift+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d left";
-        "${mod}+Alt+Shift+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d right";
-        "${mod}+Alt+Control+Shift+Right" = "move workspace to output right";
-        "${mod}+Alt+Control+Shift+Left" = "move workspace to output left";
-      };
+          "XF86MonBrightnessUp" = "exec light -A 1";
+          "XF86MonBrightnessDown" = "exec light -U 1";
+
+          "${mod}+Alt+Up" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d up";
+          "${mod}+Alt+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d down";
+          "${mod}+Alt+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d left";
+          "${mod}+Alt+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -d right";
+
+          "${mod}+Alt+Shift+Up" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d up";
+          "${mod}+Alt+Shift+Down" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d down";
+          "${mod}+Alt+Shift+Left" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d left";
+          "${mod}+Alt+Shift+Right" = "exec ${pkgs.bash.outPath}/bin/bash ${workspaceSwitchScript} -m -d right";
+          "${mod}+Alt+Control+Shift+Right" = "move workspace to output right";
+          "${mod}+Alt+Control+Shift+Left" = "move workspace to output left";
+        };
       window.border = 1;
       colors = {
         background = "#000000";
@@ -825,7 +868,7 @@ end
         };
       };
       fonts = {
-        names = [ "InconsolataNerdFont" ];
+        names = ["InconsolataNerdFont"];
         size = 10.0;
       };
       bars = [
@@ -834,7 +877,12 @@ end
         }
       ];
       output = {
-        "eDP-1" = { bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";  pos = "0 0"; res = "1920x1080"; scale = "1.0"; };
+        "eDP-1" = {
+          bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";
+          pos = "0 0";
+          res = "1920x1080";
+          scale = "1.0";
+        };
       };
       terminal = "kitty";
       startup = [];

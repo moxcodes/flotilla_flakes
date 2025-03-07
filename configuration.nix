@@ -1,14 +1,15 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
-
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -17,7 +18,7 @@
 
   # required for hibernation
   security.protectKernelImage = false;
-  boot.kernelParams = [ "resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141" ];
+  boot.kernelParams = ["resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141"];
   boot.resumeDevice = "/dev/disk/by-uuid/3778fe96-f599-496a-b760-2c6bf7414141";
   services.logind.lidSwitch = "hibernate";
   services.logind.extraConfig = ''
@@ -62,14 +63,14 @@
 
   sops.defaultSopsFile = ./secrets/example.yaml;
   sops.age = {
-      keyFile = "/var/lib/sops-nix/key.txt";
-      generateKey = true;
-    };
+    keyFile = "/var/lib/sops-nix/key.txt";
+    generateKey = true;
+  };
   sops.secrets.example_key = {};
 
   sops.templates.test_template.content = ''
-      password = "${config.sops.placeholder.example_key}"
-    '';
+    password = "${config.sops.placeholder.example_key}"
+  '';
 
   systemd.services.myservice = {
     serviceConfig = {
@@ -80,7 +81,7 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = ["nvidia"];
   services.blueman.enable = true;
   hardware.opengl.enable = true;
   hardware.opengl.driSupport32Bit = true;
@@ -91,8 +92,8 @@
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.open = false;
-#  hardware.nvidia.prime.offload.enable = true;
-#  hardware.nvidia.prime.offload.enableOffloadCmd = true;
+  #  hardware.nvidia.prime.offload.enable = true;
+  #  hardware.nvidia.prime.offload.enableOffloadCmd = true;
   hardware.nvidia.prime.sync.enable = true;
   hardware.nvidia.prime.nvidiaBusId = "PCI:1:0:0";
   hardware.nvidia.prime.intelBusId = "PCI:0:2:0";
@@ -139,12 +140,12 @@
   users.users.mox = {
     isNormalUser = true;
     description = "Jordan Moxon";
-    extraGroups = [ "docker" "networkmanager" "video" "wheel" "disk" ];
+    extraGroups = ["docker" "networkmanager" "video" "wheel" "disk"];
     shell = pkgs.fish;
   };
 
   nix.package = pkgs.nixVersions.latest;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
   nix.settings.auto-optimise-store = true;
 
   # Allow unfree packages
@@ -158,7 +159,7 @@
     WLR_NO_HARDWARE_CURSORS = "1";
     MOZ_ENABLE_WAYLAND = "1";
     GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBARARY_NAME="nvidia";
+    __GLX_VENDOR_LIBARARY_NAME = "nvidia";
   };
   environment.systemPackages = with pkgs; [
     cargo
@@ -205,11 +206,13 @@
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
     # Syncthing ports (gui and sync protocol) - for mox
-    8384 22000
+    8384
+    22000
   ];
   networking.firewall.allowedUDPPorts = [
     # Syncthing ports (sync protocol) - for mox
-    22000 21027
+    22000
+    21027
   ];
 
   # This value determines the NixOS release from which the default
@@ -219,5 +222,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.11"; # Did you read the comment?
-
 }

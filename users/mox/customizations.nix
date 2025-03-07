@@ -1,7 +1,13 @@
-{ config, lib, pkgs, sysname, ...}:
 {
-  fontsize = {
-    "ares" = 7;
-    "rocinante" = 10;
-  }."${sysname}";
+  sysname,
+  config,
+  pkgs,
+  ...
+}: {
+  fontsize =
+    {
+      "ares" = 10;
+      "rocinante" = 7;
+    }
+    ."${sysname}";
 }
