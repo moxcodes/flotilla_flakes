@@ -22,9 +22,13 @@
   };
 in {
   imports = [
+    # program modules/extensions
     ./modules/gitmux.nix
     ./modules/spacemacs.nix
     ./modules/python_manager.nix
+
+    # personal config factoring
+    ./matrix.nix
   ];
   python_manager = with pkgs; {
     enable = true;
@@ -429,6 +433,7 @@ in {
     };
     shellInit = ''
       set -g EDITOR "emacsclient -nw"
+      set -x DEVSHELL_SHELL ""
       if test -n "$DEVSHELL"
       else
         set -x DEVSHELL ""
