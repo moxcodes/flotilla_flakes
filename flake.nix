@@ -31,7 +31,7 @@
           (import ./users
             {
               home_manager_path = home-manager.outPath;
-              sysname = "ares";
+              sysname = "rocinante";
             })
         ];
       };
