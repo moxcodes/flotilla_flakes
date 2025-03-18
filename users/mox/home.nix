@@ -433,7 +433,7 @@ in {
     };
     shellInit = ''
       set -g EDITOR "emacsclient -nw"
-      set -x DEVSHELL_SHELL ""
+      set -x DEVSHELL_SHELL $SHELL
       if test -n "$DEVSHELL"
       else
         set -x DEVSHELL ""

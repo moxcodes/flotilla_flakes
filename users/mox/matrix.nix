@@ -2,7 +2,7 @@
 with lib;
 {
   config = {
-    home.packages = [
+    home.packages = with pkgs; [
       matrix-commander-rs
       element-web
     ];
