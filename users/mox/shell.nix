@@ -11,7 +11,6 @@
   home.packages = with pkgs; [
     bat
     browsh
-    emacs
     fd
     figlet
     fish

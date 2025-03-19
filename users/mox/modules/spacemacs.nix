@@ -1298,7 +1298,21 @@ in {
               + ")\n"
               + "\n(defun dotspacemacs/user-config  ()\n"
               + (indent 2)
-              +
+              + (if (attrsets.hasAttrByPath ["jsonnet"] cfg.layers)
+                then ''
+                (use-package jsonnet-mode
+                  :ensure t
+                  :config
+                  (add-to-list 'eglot-server-programs
+                               '(jsonnet-mode . ("jsonnet-lsp" "lsp")))
+                  :mode (
+                         ("\\.jsonnet\\'" . jsonnet-mode)
+                         ("\\.jsonnet.TEMPLATE\\'" . jsonnet-mode)
+                         )
+                  :hook
+                  (jsonnet-mode . (lambda()
+                                    (eglot-ensure))))
+                '' else "") +
               # extra package conf contents
               builtins.replaceStrings ["\n"] [("\n" + indent 2)]
               (strings.concatStringsSep "\n"
@@ -1385,6 +1399,9 @@ in {
                 == "'lsp")
               [(builtins.getFlake "github:nix-community/rnix-lsp/95d40673fe43642e2e1144341e86d0036abd95d9").packages."${system}".rnix-lsp])
             (mkIf (attrsets.hasAttrByPath ["rust"] cfg.layers) [rust-analyzer clippy rustfmt])
+            (mkIf (attrsets.hasAttrByPath ["jsonnet"] cfg.layers) [(callPackage ../deriv/jsonnet-lsp {})])
+            (mkIf (attrsets.hasAttrByPath ["go"] cfg.layers) [ gopls ])
+            (mkIf (attrsets.hasAttrByPath ["scala"] cfg.layers) [ metals ])
           ]
       );
     python_manager.python_packages = with pkgs;

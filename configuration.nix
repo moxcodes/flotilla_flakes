@@ -165,7 +165,6 @@
     cargo
     clang
     docker
-    emacs
     fish
     git
     glib
