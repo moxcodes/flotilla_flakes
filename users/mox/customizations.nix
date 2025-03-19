@@ -10,5 +10,5 @@
       "rocinante" = 7.0;
     }
     ."${sysname}";
-  
+  email = "jordan@mox.codes";  
 }

@@ -1,8 +1,9 @@
 {custom}: {
   config,
   pkgs,
+  lib,
   ...
-}: let
+}@args: let
   configure-gtk = pkgs.writeTextFile {
     name = "configure-gtk";
     destination = "/bin/configure-gtk";
@@ -20,59 +21,44 @@
       gsettings set $gnome_schema monospace-font-name 'InconsolataNerdFont 8'
     '';
   };
-in {
+in
+{
   imports = [
     # program modules/extensions
-    ./modules/gitmux.nix
-    ./modules/spacemacs.nix
     ./modules/python_manager.nix
 
     # personal config factoring
-    ./matrix.nix
+    ((import ./backend_dev_edc.nix {custom = custom; }) args)
+    ((import ./matrix.nix {custom = custom; }) args)
+    ((import ./shell.nix {custom = custom; }) args)    
   ];
   python_manager = with pkgs; {
     enable = true;
     python = python3;
     python_packages = [
-      "beautifulsoup4"
       "google-api-python-client"
       "google-auth-httplib2"
       "google-auth-oauthlib"
-      "numpy"
-      "pyusb"
-      "selenium"
       "websocket-client"
     ];
   };
   home.packages = with pkgs; [
     age
-    android-tools
     awscli2
     alsa-utils
-    bat
     bemenu
-    browsh
     chromedriver
     configure-gtk
     dconf
     dmenu
     dmidecode
-    fd
     feh
-    fzf
     firefox-bin
     glxinfo
     gimp
-    gitmux
-    gnumake
     grim
     nerd-fonts.inconsolata
     nerd-fonts.symbols-only
-    jq
-    # TODO - try to make this a part of emacs dependencies somehow
-    ispell
-    file
-    font-awesome
     kitty
     krita
     lutris
@@ -85,7 +71,6 @@ in {
     sops
     steam
     syncthing
-    tmux
     texlive.combined.scheme-full
     waybar
     wl-clipboard
@@ -115,24 +100,6 @@ in {
     };
     font.name = "InconsolataNerdFont";
     font.size = custom.fontsize;
-  };
-
-  programs.git = {
-    enable = true;
-    userName = "Jordan Moxon";
-    userEmail = "jordan@mox.codes";
-    ignores = [
-      "*~"
-      ".*"
-    ];
-    delta.enable = true;
-    extraConfig = {
-      init.defaultBranch = "main";
-    };
-  };
-
-  programs.emacs = {
-    enable = true;
   };
 
   # programs.firefox = {
@@ -170,359 +137,6 @@ in {
       map kitty_mod+equal change_font_size all +1.0
       map kitty_mod+minus change_font_size all -1.0
     '';
-  };
-
-  programs.tmux = import ./programs/tmux.nix {
-    config = config;
-    pkgs = pkgs;
-  };
-  programs.gitmux = {
-    enable = true;
-    styles.clear = "#[fg=white]";
-    symbols = {
-      branch = " ";
-      hashprefix = "#";
-      ahead = "󰶼";
-      behind = "󰶹";
-      staged = "󱒌 ";
-      conflict = " ";
-      modified = " ";
-      untracked = " ";
-      stashed = "󰽃 ";
-      insertions = "+";
-      deletions = "-";
-      clean = " ";
-    };
-    layout = ''[branch, " ▏", divergence, " ▏", flags, " ▏", stats ]'';
-  };
-  programs.spacemacs = {
-    enable = true;
-    layers = {
-      "c-c++" = {
-        variables = {
-          "c-c++-backend" = "'lsp-ccls";
-          "c-c++-default-mode-for-headers" = "'c++-mode";
-        };
-      };
-      dash = {};
-      deft = {};
-      git = {};
-      graphviz = {};
-      haskell = {};
-      html = {};
-      imenu-list = {};
-      ivy = {};
-      javascript = {};
-      lsp = {};
-      lua = {};
-      markdown = {};
-      "multiple-cursors" = {};
-      # in emacs editing the nix config for emacs in nix configs...
-      nixos = {
-        variables = {
-          "nix-backend" = "'lsp";
-          "nixos-format-on-save" = "t";
-        };
-      };
-      systemd = {};
-      "shell-scripts" = {
-        variables = {
-          "shell-scripts-backend" = "'lsp";
-        };
-      };
-      php = {};
-      python = {
-        variables = {
-          "python-lsp-server" = "'pylsp";
-        };
-      };
-      rust = {};
-      sql = {};
-      treemacs = {};
-      syntax-checking = {};
-      version_control = {
-        variables = {
-          "version-control-diff-tool" = "'diff-hl";
-          "version-control_diff-side" = "'left";
-          "version-control-global-margin" = "t";
-        };
-      };
-      yaml = {};
-    };
-    dotspacemacs_options = {
-      "editing-style" = "'emacs";
-    };
-    extra_packages = {
-      "undo-tree" = {
-        config = "(global-undo-tree-mode)";
-      };
-      "diff-hl" = {
-        config = ''
-          (global-diff-hl-mode)
-          (diff-hl-margin-mode)
-        '';
-      };
-      "highlight-indent-guides" = {
-        config = ''
-          (setq highlight-indent-guides-suppress-auto-error t)
-          (highlight-indent-guides-mode)
-          (setq highlight-indent-guides-method 'character)
-          (set-face-foreground 'highlight-indent-guides-character-face "#222222")
-        '';
-      };
-      "mmm-mode" = {
-        config = ''
-          (require 'mmm-mode)
-          (setq mmm-global-mode 'maybe)
-        '';
-      };
-      "xclip" = {
-        config = ''
-          (xclip-mode 1)
-        '';
-      };
-    };
-    extra_functions = builtins.readFile ./spacemacs_extras/extra_functions.el;
-    extra_els = {
-      google-c-style = builtins.fetchurl {
-        url = "https://raw.githubusercontent.com/google/styleguide/8487c083e1faecb1259be8a8873618cfdb69d33d/google-c-style.el";
-        sha256 = "017m6sf66zm9pq0zds8fgrmmzp3w73svg95fz04lj3wbj3r3gfbc";
-      };
-    };
-    global_config = {
-      remove_keybindings = [
-        "<left>"
-        "<right>"
-        "<up>"
-        "<down>"
-        "C-<left>"
-        "C-<right>"
-        "C-<up>"
-        "C-<down>"
-        "M-;"
-        "M-c"
-        "C-?"
-        "M-."
-        "M-TAB"
-        "C-i"
-        "M-s"
-        "M-j"
-        "M-i"
-        "M-o"
-        "M-I"
-        "M-O"
-      ];
-      keybindings = {
-        "<down>" = "'backward-paragraph";
-        "M-n" = "'forward-paragraph";
-        "<up>" = "'backward-paragraph";
-        "M-p" = "'backward-paragraph";
-        "<right>" = "'forward-to-separator";
-        "M-f" = "'forward-to-separator";
-        "<left>" = "'forward-to-separator";
-        "M-b" = "'backward-to-separator";
-        "M-P" = "(lambda () (interactive) (previous-line 5))";
-        "M-N" = "(lambda () (interactive) (next-line 5))";
-        "C-h" = "'delete-backward-char";
-        "M-h" = "'backward-kill-word";
-        "M-j" = "'find-file-at-point";
-        "C-j" = "'browse-url-at-point";
-        "M-;" = "'toggle-comment-on-line";
-        "M-." = "'lsp-find-definition";
-        "M-s" = "'counsel-git-grep";
-        "M-i" = "'backward-local-mark";
-        "M-o" = "'forward-local-mark";
-        "M-I" = "'backward-global-mark";
-        "M-O" = "'forward-global-mark";
-        "M-TAB" = "'lsp-format-buffer";
-        "TAB" = "'lsp-format-region";
-        "M-q" = "'fill-sentence";
-        "C-?" = "'help-command";
-      };
-      set_variables = {
-        auto-window-vscroll = "nil";
-        company-idle-delay = "0.05";
-        eldoc-idle-delay = "0.05";
-        eldoc-echo-area-use-multiline-p = "2";
-        fast-but-imprecise-scrolling = "t";
-        gc-cons-threshold = "100000000";
-        global-mark-ring-max = "512";
-        indent-tabs-mode = "nil";
-        jit-lock-defer-time = "0";
-        js-indent-level = "2";
-        linum-format = "\"%4d\u2502\"";
-        lsp-completion-provider = ":capf";
-        lsp-diagnostic-package = ":none";
-        lsp-disabled-clients = "'(mspyls)";
-        lsp-file-watch-threshold = "5000";
-        lsp-headerline-breadcrumb-segments = "'(project file symbols)";
-        lsp-idle-delay = "0.2";
-        lsp-ui-sideline-enable = "nil";
-        lsp-ui-doc-enable = "nil";
-        lsp-ui-flycheck-enable = "nil";
-        lsp-ui-imenu-enable = "t";
-        lsp-ui-sideline-ignore-duplicate = "t";
-        mark-ring-max = "512";
-        python-indent-offset = "4";
-        py-indent-offset = "4";
-        save-interprogram-paste-before-kill = "t";
-        separators-regexp = "\"[\\-'\\\"();:,.\\\\/?!@#%&*+= ]\"";
-        show-paren-delay = "0";
-        tab-width = "2";
-        read-process-output-max = "(* 8192 8192)";
-      };
-      extra_config = ''
-        (menu-bar-mode -1)
-        (toggle-scroll-bar -1)
-        (tool-bar-mode -1)
-        (mapc 'my-mmm-markdown-auto-class
-              '("awk" "bibtex" "c" "cpp" "css" "html" "latex" "lisp" "makefile"
-                "markdown" "python" "r" "ruby" "sql" "stata" "xml" "php"))
-
-        (mmm-add-classes
-          '((markdown-bash
-             :submode shell-script-mode
-             :front "^```bash[\n\r]+"
-             :back "^```$")))
-      '';
-    };
-    modal_config = {
-      python-mode = {
-        set_variables = {
-          # Just like to be sure I guess...
-          python-indent-offset = "4";
-          py-indent-offset = "4";
-          tab-width = "4";
-        };
-      };
-      js-mode = {};
-      LaTeX-mode = {
-        set_variables = {
-          sentence-end = "\"[.!?]\"";
-        };
-      };
-      c-mode-common = {
-        keybindings = {
-          "M-TAB" = "'clang-format-region";
-        };
-        extra_config = "google-set-c-style";
-      };
-      "c++-mode" = {
-        extra_config = "c++-spelling-hook";
-      };
-    };
-    custom_colors = {
-      bg1 = "nil";
-      bg2 = "#151515";
-      base = "#22DD22";
-      comment = "#FF2222";
-      type = "#99FF22";
-      var = "#00FFBB";
-      mat = "#222222";
-      lnum = "#777777";
-      const = "#99CC99";
-      highlight = "#222222";
-      comment-bg = "#000000";
-    };
-  };
-
-  programs.fish = {
-    enable = true;
-    functions = {
-      mx = "emacsclient -nw $argv";
-    };
-    shellInit = ''
-      set -g EDITOR "emacsclient -nw"
-      set -x DEVSHELL_SHELL $SHELL
-      if test -n "$DEVSHELL"
-      else
-        set -x DEVSHELL ""
-        set -x DEVSHELL_ICON ""
-      end
-      set -U fish_greeting ""
-      # handy function from projekt0n/biscuit
-      set right_segment_separator "▕"
-      set left_segment_separator "▏"
-      function prompt_segment -d "Function to draw a segment"
-        set -l bg
-        set -l fg
-        if [ -n "$argv[2]" ]
-          set bg $argv[2]
-        else
-          set bg normal
-        end
-        if [ -n "$argv[3]" ]
-          set fg $argv[3]
-        else
-          set fg normal
-        end
-
-        set -l sep_col (set_color $argv[1] -b $bg)
-        set -l txt_col (set_color -o $fg -b $bg)
-        set -l normal (set_color normal)
-
-        set -l lsep $sep_col $left_segment_separator
-        set -l rsep $sep_col $right_segment_separator
-
-        if [ -n "$argv[4]" ]
-          set -l data  $txt_col $argv[4] $normal
-          echo -n -s $lsep $data $rsep
-        end
-        set_color normal -b normal
-      end
-      function fish_prompt
-        set -l this_status $status
-        set -l color white
-        if test $this_status -eq 1
-          set color ff31aa
-        else if test $this_status -ge 126 && test $this_status -le 127
-          set color ff8700
-        else if test $this_status -eq 130
-          set color ffec00
-        else if test $this_status -ge 128
-          set color cc00ff
-        else if test $this_status -ge 1
-          set color ff0000
-        else
-          set color white
-        end
-        prompt_segment $color 222 green (prompt_hostname)
-        echo -n $DEVSHELL_ICON
-        echo -n " "
-        prompt_segment $color 222 cyan (date '+%H:%M:%S')
-        echo -n " "
-      end
-      function fish_right_prompt
-        set -l this_status $status
-        set -l color white
-        if test $this_status -eq 1
-          set color ff31aa
-        else if test $this_status -ge 126 && test $this_status -le 127
-          set color ff8700
-        else if test $this_status -eq 130
-          set color ffec00
-        else if test $this_status -ge 128
-          set color cc00ff
-        else if test $this_status -ge 1
-          set color ff0000
-        else
-          set color white
-        end
-        prompt_segment $color 222 red (prompt_pwd)
-      end
-        set_color
-    '';
-    plugins = [
-      {
-        name = "fzf";
-        src = pkgs.fetchFromGitHub {
-          owner = "PatrickF1";
-          repo = "fzf.fish";
-          rev = "e5d54b93cd3e096ad6c2a419df33c4f50451c900";
-          sha256 = "5cO5Ey7z7KMF3vqQhIbYip5JR6YiS2I9VPRd6BOmeC8=";
-        };
-      }
-    ];
   };
 
   programs.zathura = {
@@ -652,37 +266,12 @@ in {
     '';
   };
 
-  services.emacs.enable = true;
   services.syncthing = {
     enable = true;
     extraOptions = [
       "-gui-address=127.0.0.1:8384"
       "-home=/home/mox/.config/syncthing"
     ];
-  };
-
-  # because the auto-generated service for tmux-continuum isn't good enough to
-  # handle the nix symlink jungle... and is borked in other ways too...
-  systemd.user.services = {
-    tmux_continuum = {
-      Unit = {
-        Description = "tmux default session (detached)";
-        Documentation = ["man:tmux(1)"];
-        # lists are duplicate keys
-        After = ["emacs.service" "syncthing.service"];
-      };
-      Service = {
-        ExecStart = "${pkgs.tmux.outPath}/bin/tmux new-session -d ${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/restore.sh";
-        ExecStop = "${pkgs.tmux.outPath}/bin/tmux run-shell ${pkgs.tmuxPlugins.resurrect.outPath}/share/tmux-plugins/resurrect/scripts/save.sh";
-        Restart = "on-failure";
-        RestartSec = "5";
-        StartLimitBurst = "5";
-        StartLimitIntervalSec = "10";
-        SuccessExitStatus = "15";
-        Type = "forking";
-      };
-      Install.WantedBy = ["default.target"];
-    };
   };
 
   xdg = {
@@ -907,3 +496,4 @@ in {
     WLR_NO_HARDWARE_CURSORS = 1;
   };
 }
+
