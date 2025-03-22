@@ -36,7 +36,7 @@
     rust-analyzer
     clippy
     rustfmt
-    (callPackage ./deriv/jsonnet-lsp {})
+    (callPackage ./deriv/rjsonnet {})
     gopls
     metals
     pyright
@@ -60,8 +60,11 @@
 
   programs.emacs = {
     enable = true;
-    extraPackages = epkgs: [ epkgs.use-package ];
-    extraConfig = import ./programs/emacs_init.el;
+    extraPackages = epkgs: [
+      epkgs.use-package
+      epkgs.jsonnet-mode
+    ];
+    extraConfig = (builtins.readFile ./programs/emacs_init.el);
   };
   services.emacs.enable = true;
 

@@ -165,7 +165,22 @@
 
 ;; packages - use-package declarations
 
+  ;; eglot section
+(require 'eglot)
 
+(use-package jsonnet-mode
+  :ensure t
+  :config
+  (add-to-list 'eglot-server-programs
+               '(jsonnet-mode . ("jsonnet-lsp" "lsp")))
+  :mode (
+         ("\\.libsonnet\\'" . libsonnet-mode)
+         ("\\.jsonnet\\'" . jsonnet-mode)
+         ("\\.jsonnet.TEMPLATE\\'" . jsonnet-mode)
+         )
+  :hook
+  (jsonnet-mode . (lambda()
+                    (eglot-ensure))))
 
 ;; keybindings
 (global-unset-key (kbd "C-<left>"))
