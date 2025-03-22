@@ -1,9 +1,8 @@
-{
-  config,
-  lib,
-  pkgs,
-  python_manager,
-  ...
+{ config
+, lib
+, pkgs
+, python_manager
+, ...
 }:
 with lib; let
   cfg = config.programs.spacemacs;
@@ -12,7 +11,7 @@ with lib; let
     options = with types; {
       variables = mkOption {
         type = attrsOf str;
-        default = {};
+        default = { };
       };
     };
   };
@@ -36,11 +35,11 @@ with lib; let
     options = with types; {
       remove_keybindings = mkOption {
         type = listOf str;
-        default = [];
+        default = [ ];
       };
       keybindings = mkOption {
         type = attrsOf str;
-        default = {};
+        default = { };
         description = ''
           New keybindings to apply; attribute name is the keystroke, value is the
           command to associate with it.
@@ -48,7 +47,7 @@ with lib; let
       };
       set_variables = mkOption {
         type = attrsOf str;
-        default = {};
+        default = { };
         description = "Variables with to assign during init";
       };
       extra_config = mkOption {
@@ -59,19 +58,20 @@ with lib; let
   };
 
   colorType = types.nullOr (types.strMatching "#[0-9A-F]{6}|nil");
-in {
+in
+{
   options = with types; {
     programs.spacemacs = {
       enable = mkEnableOption "spacemacs, a configuration layer for emacs";
 
       layers = mkOption {
         type = attrsOf spacemacsLayerType;
-        default = {};
+        default = { };
       };
 
       extra_packages = mkOption {
         type = attrsOf packageSetupType;
-        default = {};
+        default = { };
         description = ''
           Names and initialization script contents for additional
           packages to load.
@@ -80,12 +80,12 @@ in {
 
       global_config = mkOption {
         type = generalConfType;
-        default = {};
+        default = { };
       };
 
       modal_config = mkOption {
         type = attrsOf generalConfType;
-        default = {};
+        default = { };
         description = ''
           Associate settings with major modes, names are major modes, and
           configuration settings are applied as mode hooks.
@@ -98,7 +98,7 @@ in {
           Paths of .el libraries to copy to .emacs.d/lisp and load.
           The attribute names must be the library names to require.
         '';
-        default = {};
+        default = { };
       };
 
       extra_functions = mkOption {
@@ -163,7 +163,7 @@ in {
         description = ''
 
         '';
-        default = {};
+        default = { };
         type = types.submodule {
           options = {
             act1 = mkOption {
@@ -384,7 +384,7 @@ in {
 
       dotspacemacs_options = mkOption {
         description = "spacemacs native options";
-        default = {};
+        default = { };
         type = types.submodule {
           options = {
             "enable-emacs-pdumper" = mkOption {
@@ -1120,10 +1120,11 @@ in {
   };
   config = mkIf cfg.enable {
     home.file = mkMerge [
-      (attrsets.mapAttrs' (name: value:
-        nameValuePair (".emacs.d/lisp/" + name + ".el")
-        {source = value;})
-      cfg.extra_els)
+      (attrsets.mapAttrs'
+        (name: value:
+          nameValuePair (".emacs.d/lisp/" + name + ".el")
+            { source = value; })
+        cfg.extra_els)
       {
         ".emacs.d" = {
           recursive = true;
@@ -1139,112 +1140,114 @@ in {
         ".spacemacs" = {
           source = pkgs.writeTextFile {
             name = ".spacemacs";
-            text = let
-              indent = count: (
-                concatStrings (replicate count " ")
-              );
-              layer_var_acc = acc: name: value: (
-                acc + "\n" + (indent 7) + name + " " + value
-              );
-              layer_acc = acc: name: value: (
-                acc
-                + "\n"
-                + (indent 5)
-                + "("
-                + name
-                + (attrsets.foldlAttrs layer_var_acc " :variables" value.variables)
-                + ")"
-              );
-              option_acc = acc: name: value: (
-                acc + "\n" + (indent 3) + "dotspacemacs-" + name + " " + value
-              );
-              packages_string = (
-                strings.optionalString (cfg.extra_packages != {})
-                ((indent 3)
-                  + "dotspacemacs-additional-packages '(use-package\n"
-                  + (indent 38)
-                  + (strings.concatStringsSep ("\n" + indent 38)
-                    (attrNames cfg.extra_packages))
-                  + ")\n")
-              );
-              color_acc = acc: name: value: (
-                acc
-                + "\n"
-                + (indent 28)
-                + "("
-                + name
-                + " . "
-                + (
-                  if value == "nil"
-                  then "nil"
-                  else "\"" + value + "\""
-                )
-                + ")"
-              );
-              custom_colors_to_use =
-                attrsets.filterAttrs (
-                  name: value: value != null
-                )
-                cfg.custom_colors;
-              custom_set_colors =
-                if (custom_colors_to_use != {})
-                then
-                  ((indent 2)
-                    + "(custom-set-variables '(spacemacs-theme-custom-colors\n"
-                    + (indent 26)
-                    + "'("
-                    + (attrsets.foldlAttrs color_acc "" custom_colors_to_use)
-                    + ")))\n")
-                else "";
-              require_acc = acc: name: value: (
-                acc + "\n" + (indent 2) + "(require '" + name + ")"
-              );
-              custom_el_config =
-                (attrsets.foldlAttrs require_acc "" cfg.extra_els)
-                + "\n";
-              create_variable_sets = varsets: spacing: (attrsets.foldlAttrs
-                (acc: name: value:
+            text =
+              let
+                indent = count: (
+                  concatStrings (replicate count " ")
+                );
+                layer_var_acc = acc: name: value: (
+                  acc + "\n" + (indent 7) + name + " " + value
+                );
+                layer_acc = acc: name: value: (
                   acc
                   + "\n"
-                  + (indent spacing)
-                  + "(setq "
+                  + (indent 5)
+                  + "("
                   + name
-                  + " "
-                  + value
-                  + ")")
-                ""
-                varsets);
-              create_remove_keybindings = remkeys: spacing: (strings.concatStringsSep ("\n" + indent spacing)
-                (lists.forEach remkeys
-                  (s: "(global-unset-key (kbd \"" + s + "\"))")));
-              create_add_keybindings = addkeys: spacing: (attrsets.foldlAttrs
-                (acc: name: value:
+                  + (attrsets.foldlAttrs layer_var_acc " :variables" value.variables)
+                  + ")"
+                );
+                option_acc = acc: name: value: (
+                  acc + "\n" + (indent 3) + "dotspacemacs-" + name + " " + value
+                );
+                packages_string = (
+                  strings.optionalString (cfg.extra_packages != { })
+                    ((indent 3)
+                      + "dotspacemacs-additional-packages '(use-package\n"
+                      + (indent 38)
+                      + (strings.concatStringsSep ("\n" + indent 38)
+                      (attrNames cfg.extra_packages))
+                      + ")\n")
+                );
+                color_acc = acc: name: value: (
                   acc
                   + "\n"
-                  + (indent spacing)
-                  + "(global-set-key (kbd \""
+                  + (indent 28)
+                  + "("
                   + name
-                  + "\") "
-                  + value
-                  + ")")
-                ""
-                addkeys);
-              create_local_remove_keybindings = remkeys: spacing: (strings.concatStringsSep ("\n" + indent spacing)
-                (lists.forEach remkeys
-                  (s: "(local-unset-key (kbd \"" + s + "\"))")));
-              create_local_add_keybindings = addkeys: spacing: (attrsets.foldlAttrs
-                (acc: name: value:
-                  acc
-                  + "\n"
-                  + (indent spacing)
-                  + "(local-set-key (kbd \""
-                  + name
-                  + "\") "
-                  + value
-                  + ")")
-                ""
-                addkeys);
-            in
+                  + " . "
+                  + (
+                    if value == "nil"
+                    then "nil"
+                    else "\"" + value + "\""
+                  )
+                  + ")"
+                );
+                custom_colors_to_use =
+                  attrsets.filterAttrs
+                    (
+                      name: value: value != null
+                    )
+                    cfg.custom_colors;
+                custom_set_colors =
+                  if (custom_colors_to_use != { })
+                  then
+                    ((indent 2)
+                      + "(custom-set-variables '(spacemacs-theme-custom-colors\n"
+                      + (indent 26)
+                      + "'("
+                      + (attrsets.foldlAttrs color_acc "" custom_colors_to_use)
+                      + ")))\n")
+                  else "";
+                require_acc = acc: name: value: (
+                  acc + "\n" + (indent 2) + "(require '" + name + ")"
+                );
+                custom_el_config =
+                  (attrsets.foldlAttrs require_acc "" cfg.extra_els)
+                  + "\n";
+                create_variable_sets = varsets: spacing: (attrsets.foldlAttrs
+                  (acc: name: value:
+                    acc
+                    + "\n"
+                    + (indent spacing)
+                    + "(setq "
+                    + name
+                    + " "
+                    + value
+                    + ")")
+                  ""
+                  varsets);
+                create_remove_keybindings = remkeys: spacing: (strings.concatStringsSep ("\n" + indent spacing)
+                  (lists.forEach remkeys
+                    (s: "(global-unset-key (kbd \"" + s + "\"))")));
+                create_add_keybindings = addkeys: spacing: (attrsets.foldlAttrs
+                  (acc: name: value:
+                    acc
+                    + "\n"
+                    + (indent spacing)
+                    + "(global-set-key (kbd \""
+                    + name
+                    + "\") "
+                    + value
+                    + ")")
+                  ""
+                  addkeys);
+                create_local_remove_keybindings = remkeys: spacing: (strings.concatStringsSep ("\n" + indent spacing)
+                  (lists.forEach remkeys
+                    (s: "(local-unset-key (kbd \"" + s + "\"))")));
+                create_local_add_keybindings = addkeys: spacing: (attrsets.foldlAttrs
+                  (acc: name: value:
+                    acc
+                    + "\n"
+                    + (indent spacing)
+                    + "(local-set-key (kbd \""
+                    + name
+                    + "\") "
+                    + value
+                    + ")")
+                  ""
+                  addkeys);
+              in
               ''
                 (defun dotspacemacs/layers ()
                   "Layer configuration"
@@ -1286,11 +1289,11 @@ in {
               + (indent 2)
               +
               # extra package init contents
-              builtins.replaceStrings ["\n"] [("\n" + indent 2)]
-              (strings.concatStringsSep "\n"
-                (attrsets.mapAttrsToList
-                  (name: value: value.init)
-                  cfg.extra_packages))
+              builtins.replaceStrings [ "\n" ] [ ("\n" + indent 2) ]
+                (strings.concatStringsSep "\n"
+                  (attrsets.mapAttrsToList
+                    (name: value: value.init)
+                    cfg.extra_packages))
               + cfg.user_init
               + ")\n"
               + "\n(defun dotspacemacs/user-load ()\n"
@@ -1298,27 +1301,112 @@ in {
               + ")\n"
               + "\n(defun dotspacemacs/user-config  ()\n"
               + (indent 2)
-              + (if (attrsets.hasAttrByPath ["jsonnet"] cfg.layers)
-                then ''
+              # TODO factor eglot logic into a loop
+              + (if (attrsets.hasAttrByPath [ "jsonnet" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (require 'eglot)
+              ''
+              + (if (attrsets.hasAttrByPath [ "jsonnet" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
                 (use-package jsonnet-mode
                   :ensure t
                   :config
                   (add-to-list 'eglot-server-programs
                                '(jsonnet-mode . ("jsonnet-lsp" "lsp")))
                   :mode (
+                         ("\\.libsonnet\\'" . libsonnet-mode)
                          ("\\.jsonnet\\'" . jsonnet-mode)
                          ("\\.jsonnet.TEMPLATE\\'" . jsonnet-mode)
                          )
                   :hook
                   (jsonnet-mode . (lambda()
                                     (eglot-ensure))))
-                '' else "") +
+              '' else "")
+              + (if (attrsets.hasAttrByPath [ "nix" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'nix-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(nix-mode . ("nil")))
+              ''
+              else "")
+              +
+              (if (attrsets.hasAttrByPath [ "python" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'python-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(python-mode . ("pyright-langserver" "--stdio")))
+              ''
+              else "")
+              +
+              (if (attrsets.hasAttrByPath [ "html" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'html-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(html-mode . ("vscode-html-language-server" "--stdio")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "css" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'css-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(css-mode . ("vscode-css-language-server" "--stdio")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "json" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'json-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(json-mode . ("vscode-json-language-server" "--stdio")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "typescript" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'typescript-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(typescript-mode . ("typescript-language-server" "--stdio")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "javascript" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'javascript-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(javascript-mode . ("typescript-language-server" "--stdio")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "rust" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'rust-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(rust-mode . ("rust-analyzer")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "go" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'go-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(go-mode . ("gopls")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "scala" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'scala-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(scala-mode . ("metals")))
+              ''
+              else "") +
+              (if (attrsets.hasAttrByPath [ "protobuf" ] cfg.layers &&
+              attrsets.hasAttrByPath [ "eglot" ] cfg.layers) then ''
+                (add-hook 'protobuf-mode-hook 'eglot-ensure)
+                (add-to-list 'eglot-server-programs
+                             '(protobuf-mode . ("protols")))
+              ''
+              else "") +
               # extra package conf contents
-              builtins.replaceStrings ["\n"] [("\n" + indent 2)]
-              (strings.concatStringsSep "\n"
-                (attrsets.mapAttrsToList
-                  (name: value: value.config)
-                  cfg.extra_packages))
+              builtins.replaceStrings [ "\n" ] [ ("\n" + indent 2) ]
+                (strings.concatStringsSep "\n"
+                  (attrsets.mapAttrsToList
+                    (name: value: value.config)
+                    cfg.extra_packages))
               + "\n"
               + (indent 2)
               +
@@ -1336,7 +1424,7 @@ in {
               (create_add_keybindings cfg.global_config.keybindings 2)
               + "\n"
               + (indent 2)
-              + (builtins.replaceStrings ["\n"] [("\n" + indent 2)]
+              + (builtins.replaceStrings [ "\n" ] [ ("\n" + indent 2) ]
                 cfg.global_config.extra_config)
               + "\n"
               + (indent 2)
@@ -1363,7 +1451,7 @@ in {
                   + (create_local_add_keybindings value.keybindings 6)
                   + "\n"
                   + (indent 6)
-                  + (builtins.replaceStrings ["\n"] [("\n" + indent 6)]
+                  + (builtins.replaceStrings [ "\n" ] [ ("\n" + indent 6) ]
                     value.extra_config)
                   + ")))\n")
                 ""
@@ -1372,53 +1460,66 @@ in {
               + cfg.user_config
               + ")\n"
               + "\n(defun dotspacemacs/emacs-custom-settings ())\n";
+              };
+              };
+              }
+              ];
+              home.packages = with pkgs;
+              with lib;
+              mkIf (attrsets.hasAttrByPath [ "lsp" ] cfg.layers || attrsets.hasAttrByPath [ "eglot" ] cfg.layers) (
+              let
+              cpp_backend =
+              attrsets.attrByPath
+              [ "c-c++" "variables" "c-c++-backend" ] ""
+              cfg.layers;
+              python_backend =
+              if (attrsets.hasAttrByPath [ "python" ] cfg.layers)
+              then
+              (attrsets.attrByPath [ "python" "variables" "python-lsp-server" ]
+              "'pylsp")
+              else "";
+              in
+              mkMerge [
+              (mkIf (cpp_backend == "'lsp-ccls") [ ccls ])
+              (mkIf (cpp_backend == "'lsp-clangd" || cpp_backend == "'eglot") [ libclang ])
+              (mkIf
+              ((attrsets.attrByPath [ "nixos" "variables" "nix-backend" ] "" cfg.layers)
+              == "'lsp")
+              [ (builtins.getFlake "github:nix-community/rnix-lsp/95d40673fe43642e2e1144341e86d0036abd95d9").packages."${system}".rnix-lsp ])
+              (mkIf
+              ((attrsets.attrByPath [ "nixos" "variables" "nix-backend" ] "" cfg.layers)
+              == "'eglot") [ nil ])
+              (mkIf (attrsets.hasAttrByPath [ "rust" ] cfg.layers) [ rust-analyzer clippy rustfmt ])
+              (mkIf (attrsets.hasAttrByPath [ "jsonnet" ] cfg.layers) [ (callPackage ../deriv/jsonnet-lsp { }) ])
+              (mkIf (attrsets.hasAttrByPath [ "go" ] cfg.layers) [ gopls ])
+              (mkIf (attrsets.hasAttrByPath [ "scala" ] cfg.layers) [ metals ])
+              (mkIf (attrsets.hasAttrByPath [ "python" ] cfg.layers) [ pyright ])
+              (mkIf (attrsets.hasAttrByPath [ "protobuf" ] cfg.layers) [ protols ])
+              (mkIf
+              (attrsets.hasAttrByPath [ "html" ] cfg.layers ||
+              attrsets.hasAttrByPath [ "css" ] cfg.layers ||
+              attrsets.hasAttrByPath [ "json" ] cfg.layers ||
+              attrsets.hasAttrByPath [ "html" ] cfg.layers) [ vscode-langservers-extracted ])
+              (mkIf
+              (attrsets.hasAttrByPath [ "typescript" ] cfg.layers ||
+              attrsets.hasAttrByPath [ "javascript" ] cfg.layers) [ typescript-language-server ])
+              ]
+              );
+            python_manager.python_packages = with pkgs;
+              with lib;
+              mkIf (attrsets.hasAttrByPath [ "lsp" ] cfg.layers || attrsets.hasAttrByPath [ "eglot" ] cfg.layers) (
+                let
+                  python_backend =
+                    if (attrsets.hasAttrByPath [ "python" ] cfg.layers)
+                    then
+                      (attrsets.attrByPath [ "python" "variables" "python-lsp-server" ]
+                        "'pylsp"
+                        cfg.layers.python)
+                    else "";
+                in
+                mkMerge [
+                  (mkIf (python_backend == "'pylsp") [ "python-lsp-server" ])
+                ]
+              );
           };
-        };
-      }
-    ];
-    home.packages = with pkgs;
-    with lib;
-      mkIf (attrsets.hasAttrByPath ["lsp"] cfg.layers) (
-        let
-          cpp_backend =
-            attrsets.attrByPath
-            ["c-c++" "variables" "c-c++-backend"] ""
-            cfg.layers;
-          python_backend =
-            if (attrsets.hasAttrByPath ["python"] cfg.layers)
-            then
-              (attrsets.attrByPath ["python" "variables" "python-lsp-server"]
-                "'pylsp")
-            else "";
-        in
-          mkMerge [
-            (mkIf (cpp_backend == "'lsp-ccls") [ccls])
-            (mkIf (cpp_backend == "'lsp-clangd") [libclang])
-            (mkIf
-              ((attrsets.attrByPath ["nixos" "variables" "nix-backend"] "" cfg.layers)
-                == "'lsp")
-              [(builtins.getFlake "github:nix-community/rnix-lsp/95d40673fe43642e2e1144341e86d0036abd95d9").packages."${system}".rnix-lsp])
-            (mkIf (attrsets.hasAttrByPath ["rust"] cfg.layers) [rust-analyzer clippy rustfmt])
-            (mkIf (attrsets.hasAttrByPath ["jsonnet"] cfg.layers) [(callPackage ../deriv/jsonnet-lsp {})])
-            (mkIf (attrsets.hasAttrByPath ["go"] cfg.layers) [ gopls ])
-            (mkIf (attrsets.hasAttrByPath ["scala"] cfg.layers) [ metals ])
-          ]
-      );
-    python_manager.python_packages = with pkgs;
-    with lib;
-      mkIf (attrsets.hasAttrByPath ["lsp"] cfg.layers) (
-        let
-          python_backend =
-            if (attrsets.hasAttrByPath ["python"] cfg.layers)
-            then
-              (attrsets.attrByPath ["python" "variables" "python-lsp-server"]
-                "'pylsp"
-                cfg.layers.python)
-            else "";
-        in
-          mkMerge [
-            (mkIf (python_backend == "'pylsp") ["python-lsp-server"])
-          ]
-      );
-  };
-}
+        }

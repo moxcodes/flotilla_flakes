@@ -7,10 +7,11 @@
   layers = {
     "c-c++" = {
       variables = {
-        "c-c++-backend" = "'lsp-ccls";
+        "c-c++-backend" = "'eglot";
         "c-c++-default-mode-for-headers" = "'c++-mode";
       };
     };
+    css = {};
     dash = {};
     deft = {};
     git = {};
@@ -22,32 +23,34 @@
     ivy = {};
     javascript = {};
     jsonnet = {};
-    lsp = {};
+    eglot = {};
     lua = {};
     markdown = {};
     "multiple-cursors" = {};
     # in emacs editing the nix config for emacs in nix configs...
     nixos = {
       variables = {
-        "nix-backend" = "'lsp";
+        "nix-backend" = "'eglot";
         "nixos-format-on-save" = "t";
       };
     };
     systemd = {};
     "shell-scripts" = {
       variables = {
-        "shell-scripts-backend" = "'lsp";
+        "shell-scripts-backend" = "'eglot";
       };
     };
     php = {};
     python = {
       variables = {
-        "python-lsp-server" = "'pylsp";
+        "python-backend" = "'eglot";
       };
     };
+    protobuf = {};
     rust = {};
     scala = {};
     sql = {};
+    typescript = {};
     treemacs = {};
     syntax-checking = {};
     version_control = {
@@ -63,6 +66,7 @@
     "editing-style" = "'emacs";
   };
   extra_packages = {
+    "bazel" = {};
     "undo-tree" = {
       config = "(global-undo-tree-mode)";
     };
@@ -72,6 +76,7 @@
         (diff-hl-margin-mode)
       '';
     };
+    "eldoc-box" = {};
     "highlight-indent-guides" = {
       config = ''
         (setq highlight-indent-guides-suppress-auto-error t)
@@ -123,13 +128,13 @@
       "M-O"
     ];
     keybindings = {
-      "<down>" = "'backward-paragraph";
+      "<down>" = "'shrink-window";
       "M-n" = "'forward-paragraph";
-      "<up>" = "'backward-paragraph";
+      "<up>" = "'enlarge-window";
       "M-p" = "'backward-paragraph";
-      "<right>" = "'forward-to-separator";
+      "<right>" = "'enlarge-window-horizontally";
       "M-f" = "'forward-to-separator";
-      "<left>" = "'forward-to-separator";
+      "<left>" = "'shrink-window-horizontally";
       "M-b" = "'backward-to-separator";
       "M-P" = "(lambda () (interactive) (previous-line 5))";
       "M-N" = "(lambda () (interactive) (next-line 5))";
@@ -138,16 +143,16 @@
       "M-j" = "'find-file-at-point";
       "C-j" = "'browse-url-at-point";
       "M-;" = "'toggle-comment-on-line";
-      "M-." = "'lsp-find-definition";
       "M-s" = "'counsel-git-grep";
       "M-i" = "'backward-local-mark";
       "M-o" = "'forward-local-mark";
       "M-I" = "'backward-global-mark";
       "M-O" = "'forward-global-mark";
-      "M-TAB" = "'lsp-format-buffer";
-      "TAB" = "'lsp-format-region";
+      "M-TAB" = "'eglot-format-buffer";
+      "TAB" = "'eglot-format";
       "M-q" = "'fill-sentence";
       "C-?" = "'help-command";
+      "C-x h" = "'eldoc";
       "C-x C-r" = "'rename-current-buffer-file";
     };
     set_variables = {

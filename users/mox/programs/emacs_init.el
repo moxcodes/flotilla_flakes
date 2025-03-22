@@ -1,3 +1,5 @@
+;; functions
+
 (defun forward-to-separator()
   "Move to the next separator like in the every NORMAL editor"
   (interactive)
@@ -68,14 +70,14 @@
   (and (eq (marker-buffer marker) (current-buffer))
        (= (marker-position marker) (point))))
 
-(defun push-mark-maybe () 
+(defun push-mark-maybe ()
   "push mark onto `global-mark-ring' if mark head or tail is not current location"
   (if (not global-mark-ring) (error "global-mark-ring empty")
     (unless (or (marker-is-point-p (car global-mark-ring))
                 (marker-is-point-p (car (reverse global-mark-ring))))
       (push-mark))))
 
-(defun push-local-mark-maybe () 
+(defun push-local-mark-maybe ()
   "push mark onto `mark-ring' if mark head or tail is not current location"
   (if (not mark-ring) (error "mark-ring empty")
     (unless (or (marker-is-point-p (car mark-ring))
@@ -84,7 +86,7 @@
 
 
 ;; improve functionality of local markers
-(defun backward-local-mark () 
+(defun backward-local-mark ()
   "use `pop-to-mark-command', pushing current point if not on ring."
   (interactive)
   (push-local-mark-maybe)
@@ -103,7 +105,7 @@
   (setq mark-ring (nreverse mark-ring)))
 
 ;; improve functionality of global markers
-(defun backward-global-mark () 
+(defun backward-global-mark ()
   "use `pop-global-mark', pushing current point if not on ring."
   (interactive)
   (push-mark-maybe)
@@ -145,3 +147,67 @@
   (let ((eldoc-display-functions
          (if arg '(eldoc-display-in-buffer) '(eldoc-display-in-echo-area))))
     (eldoc t)))
+
+;; packages - preamble
+
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; packages - use-package declarations
+
+
+
+;; keybindings
+(global-unset-key (kbd "C-<left>"))
+(global-unset-key (kbd "C-<right>"))
+(global-unset-key (kbd "C-<up>"))
+(global-unset-key (kbd "C-<down>"))
+(global-unset-key (kbd "M-;"))
+(global-unset-key (kbd "M-c"))
+(global-unset-key (kbd "C-?"))
+(global-unset-key (kbd "M-."))
+(global-unset-key (kbd "M-TAB"))
+(global-unset-key (kbd "C-i"))
+(global-unset-key (kbd "M-s"))
+(global-unset-key (kbd "M-j"))
+(global-unset-key (kbd "M-i"))
+(global-unset-key (kbd "M-o"))
+(global-unset-key (kbd "M-I"))
+(global-unset-key (kbd "M-O"))
+
+(global-set-key (kbd "<down>") 'shrink-window)
+(global-set-key (kbd "<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "<up>") 'enlarge-window)
+(global-set-key (kbd "C-?") 'help-command)
+(global-set-key (kbd "C-h") 'delete-backward-char)
+(global-set-key (kbd "C-j") 'browse-url-at-point)
+(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+(global-set-key (kbd "C-x h") 'eldoc)
+(global-set-key (kbd "M-;") 'toggle-comment-on-line)
+(global-set-key (kbd "M-I") 'backward-global-mark)
+(global-set-key (kbd "M-N") (lambda () (interactive) (next-line 5)))
+(global-set-key (kbd "M-O") 'forward-global-mark)
+(global-set-key (kbd "M-P") (lambda () (interactive) (previous-line 5)))
+(global-set-key (kbd "M-TAB") 'eglot-format-buffer)
+(global-set-key (kbd "M-b") 'backward-to-separator)
+(global-set-key (kbd "M-f") 'forward-to-separator)
+(global-set-key (kbd "M-h") 'backward-kill-word)
+(global-set-key (kbd "M-i") 'backward-local-mark)
+(global-set-key (kbd "M-j") 'find-file-at-point)
+(global-set-key (kbd "M-n") 'forward-paragraph)
+(global-set-key (kbd "M-o") 'forward-local-mark)
+(global-set-key (kbd "M-p") 'backward-paragraph)
+(global-set-key (kbd "M-q") 'fill-sentence)
+(global-set-key (kbd "M-s") 'counsel-git-grep)
+(global-set-key (kbd "TAB") 'eglot-format)

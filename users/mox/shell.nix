@@ -6,7 +6,7 @@
   imports = [
     # program modules/extensions
     ./modules/gitmux.nix
-    ./modules/spacemacs.nix
+#    ./modules/spacemacs.nix
   ];
   home.packages = with pkgs; [
     bat
@@ -29,6 +29,20 @@
     silver-searcher
     tmux
     yq
+    
+    # Spacemacs refugees -- TODO move around to separate package
+    libclang
+    nil
+    rust-analyzer
+    clippy
+    rustfmt
+    (callPackage ./deriv/jsonnet-lsp {})
+    gopls
+    metals
+    pyright
+    protols
+    vscode-langservers-extracted
+    typescript-language-server
   ];
   programs.git = {
     enable = true;
@@ -46,6 +60,8 @@
 
   programs.emacs = {
     enable = true;
+    extraPackages = epkgs: [ epkgs.use-package ];
+    extraConfig = import ./programs/emacs_init.el;
   };
   services.emacs.enable = true;
 
@@ -100,10 +116,10 @@
   };
 
 
-  programs.spacemacs = import ./programs/spacemacs.nix {
-    config = config;
-    pkgs = pkgs;
-  };
+  # programs.spacemacs = import ./programs/spacemacs.nix {
+  #   config = config;
+  #   pkgs = pkgs;
+  # };
 
   programs.fish = {
     enable = true;
