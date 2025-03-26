@@ -9,7 +9,9 @@
 #    ./modules/spacemacs.nix
   ];
   home.packages = with pkgs; [
+    bazel-buildtools
     bat
+    # (callPackage ./deriv/bazel-lsp {})
     browsh
     fd
     figlet
@@ -37,6 +39,7 @@
     clippy
     rustfmt
     (callPackage ./deriv/rjsonnet {})
+    go-jsonnet
     gopls
     metals
     pyright
@@ -58,11 +61,24 @@
     };
   };
 
+  home.file.".emacs.d/mox-theme.el".text = (builtins.readFile ./programs/mox-theme.el);
+
   programs.emacs = {
     enable = true;
     extraPackages = epkgs: [
-      epkgs.use-package
+      epkgs.bazel
+      epkgs.consult
+      epkgs.corfu-terminal
       epkgs.jsonnet-mode
+      epkgs.marginalia
+      epkgs.markdown-mode
+      epkgs.nerd-icons-completion
+      epkgs.nix-mode
+      epkgs.orderless
+      epkgs.rust-mode
+      epkgs.scala-mode
+      epkgs.use-package
+      epkgs.vertico
     ];
     extraConfig = (builtins.readFile ./programs/emacs_init.el);
   };

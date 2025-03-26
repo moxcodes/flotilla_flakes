@@ -1,4 +1,4 @@
-;; functions
+ ;; functions
 
 (defun forward-to-separator()
   "Move to the next separator like in the every NORMAL editor"
@@ -63,13 +63,11 @@
 ;; marker improvements came from stack overflow snippets:
 ;; https://stackoverflow.com/questions/3393834/how-to-move-forward-and-backward-in-emacs-mark-ring
 
-
-
 (defun marker-is-point-p (marker)
   "test if marker is current point"
   (and (eq (marker-buffer marker) (current-buffer))
        (= (marker-position marker) (point))))
-
+ 
 (defun push-mark-maybe ()
   "push mark onto `global-mark-ring' if mark head or tail is not current location"
   (if (not global-mark-ring) (error "global-mark-ring empty")
@@ -165,6 +163,204 @@
 
 ;; packages - use-package declarations
 
+;; Enable Vertico.
+(use-package vertico
+  :ensure t
+  :config
+  (vertico-mode))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :ensure t
+  :config
+  (savehist-mode))
+
+;; Emacs minibuffer configurations.
+(use-package emacs
+  :ensure t
+  :custom
+  ;; Support opening new minibuffers from inside existing minibuffers.
+  (enable-recursive-minibuffers t)
+  ;; Hide commands in M-x which do not work in the current mode.  Vertico
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  (tab-always-indent 'complete)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+  :config
+  (hl-line-mode))
+
+;; Example configuration for Consult
+(use-package consult
+  :ensure t
+  ;; Replace bindings. Lazily loaded by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ;; ("C-c M-x" . consult-mode-command)
+         ;; ("C-c h" . consult-history)
+         ;; ("C-c k" . consult-kmacro)
+         ;; ("C-c m" . consult-man)
+         ;; ("C-c i" . consult-info)
+         ;; ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ;; ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ;; ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ;; ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ;; ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ;; ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+         ;; ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ;; ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ;; ("M-#" . consult-register-load)
+         ;; ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ;; ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ;; ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ;; ("M-g e" . consult-compile-error)
+         ;; ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ;; ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ;; ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ;; ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ;; ("M-g m" . consult-mark)
+         ;; ("M-g k" . consult-global-mark)
+         ;; ("M-g i" . consult-imenu)
+         ;; ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ;; ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ;; ("M-s c" . consult-locate)
+         ;; ("M-s g" . consult-grep)
+         ;; ("M-s G" . consult-git-grep)
+         ;; ("M-s r" . consult-ripgrep)
+         ("C-s" . consult-line)
+         ;; ("M-s L" . consult-line-multi)
+         ;; ("M-s k" . consult-keep-lines)
+         ;; ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ;; ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ;; ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ;; ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ;; ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ;; ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         ;; :map minibuffer-local-map
+         ;; ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+              ;; ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+	      )
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  ;; :init
+
+  ;; Tweak the register preview for `consult-register-load',
+  ;; `consult-register-store' and the built-in commands.  This improves the
+  ;; register formatting, adds thin separator lines, register sorting and hides
+  ;; the window mode line.
+  ;; (advice-add #'register-preview :override #'consult-register-window)
+  ;; (setq register-preview-delay 0.5)
+
+  ;; Use Consult to select xref locations with preview
+  ;; (setq xref-show-xrefs-function #'consult-xref
+        ;; xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  ;; :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  ;; (consult-customize
+   ;; consult-theme :preview-key '(:debounce 0.2 any)
+   ;; consult-ripgrep consult-git-grep consult-grep consult-man
+   ;; consult-bookmark consult-recent-file consult-xref
+   ;; consult--source-bookmark consult--source-file-register
+   ;; consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   ;; :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  ;; (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
+)
+
+(use-package orderless
+  :ensure t
+  :custom
+  (orderless-component-separator #'orderless-escapable-split-on-space)
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion))))
+  :config
+  (setq completion-styles '(orderless)
+	completion-category-defaults nil
+	completion-category-overrides '((file (styles . (partial-completion)))))
+  (setq orderless-matching-styles '(orderless-flex))
+  (setq orderless-affix-dispatch-alist
+	'((37 . char-fold-to-regexp)
+	  (33 . orderless-not)
+	  (38 . orderless-annotation)
+	  (44 . orderless-initialism)
+	  (61 . orderless-literal)
+	  (94 . orderless-literal-prefix)
+	  (124 . orderless-regexp)))
+  )
+
+(use-package marginalia
+  :ensure t
+  :after vertico
+  :bind
+  (:map minibuffer-local-map
+	("M-A" . marginalia-cycle))
+  :custom
+  (marginalia-max-relative-age 0)
+  (marginalia-align 'right)
+  :init
+  (marginalia-mode))
+
+(use-package nerd-icons-completion
+  :ensure t
+  :after marginalia
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(use-package corfu
+  :ensure t
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-preselect 'prompt)      ;; Preselect the prompt
+
+  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+  :config
+  (global-corfu-mode)
+  (corfu-terminal-mode))
+
+;; languages
+
+(use-package bazel
+  :ensure t
+  :hook
+  (bazel-mode (lambda()
+		flymake-mode)))
+
   ;; eglot section
 (require 'eglot)
 
@@ -172,7 +368,11 @@
   :ensure t
   :config
   (add-to-list 'eglot-server-programs
-               '(jsonnet-mode . ("jsonnet-lsp" "lsp")))
+               '(jsonnet-mode . ("jsonnet-ls"
+				 :initializationOptions
+				 ;; TODO: this is kindof garbage. Fix it.
+				 (:format_engine "bin-jsonnetfmt-stdio")
+				 )))
   :mode (
          ("\\.libsonnet\\'" . libsonnet-mode)
          ("\\.jsonnet\\'" . jsonnet-mode)
@@ -180,39 +380,70 @@
          )
   :hook
   (jsonnet-mode . (lambda()
+		    flymake-mode
                     (eglot-ensure))))
 
-;; keybindings
-(global-unset-key (kbd "C-<left>"))
-(global-unset-key (kbd "C-<right>"))
-(global-unset-key (kbd "C-<up>"))
-(global-unset-key (kbd "C-<down>"))
-(global-unset-key (kbd "M-;"))
-(global-unset-key (kbd "M-c"))
-(global-unset-key (kbd "C-?"))
-(global-unset-key (kbd "M-."))
-(global-unset-key (kbd "M-TAB"))
-(global-unset-key (kbd "C-i"))
-(global-unset-key (kbd "M-s"))
-(global-unset-key (kbd "M-j"))
-(global-unset-key (kbd "M-i"))
-(global-unset-key (kbd "M-o"))
-(global-unset-key (kbd "M-I"))
-(global-unset-key (kbd "M-O"))
+(use-package nix-mode
+  :ensure t
+  :config
+  (add-to-list 'eglot-server-programs
+	       '(nix-mode . ("nil" "--stdio")))
+  :hook
+  (nix-mode . (lambda()
+		flymake-mode
+		(eglot-ensure))))
 
-(global-set-key (kbd "<down>") 'shrink-window)
-(global-set-key (kbd "<left>") 'shrink-window-horizontally)
-(global-set-key (kbd "<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "<up>") 'enlarge-window)
-(global-set-key (kbd "C-?") 'help-command)
+(use-package rust-mode
+  :hook
+  (rust-mode . (lambda()
+		 flymake-mode
+		 (eglot-ensure))))
+
+(use-package scala-mode
+  :interpreter ("scala" . scala-mode)
+  :hook
+  (scala-mode (lambda()
+		flymake-mode
+		(eglot-ensure))))
+
+(use-package markdown-mode
+  :ensure t
+  :init
+  (setq markdown-command "multimarkdown")
+  (setq markdown-hide-markup t))
+
+;; extra hooks
+(add-hook 'emacs-lisp-mode-hook 'flymake-mode)
+
+;; keybindings
+;; (global-unset-key (kbd "<down>"))
+;; (global-unset-key (kbd "<left>"))
+;; (global-unset-key (kbd "<right>"))
+;; (global-unset-key (kbd "<up>"))
+;; (global-unset-key (kbd "C-<left>"))
+;; (global-unset-key (kbd "C-<right>"))
+;; (global-unset-key (kbd "C-<up>"))
+;; (global-unset-key (kbd "C-<down>"))
+;; (global-unset-key (kbd "M-;"))
+;; (global-unset-key (kbd "M-c"))
+;; (global-unset-key (kbd "C-?"))
+;; (global-unset-key (kbd "M-."))
+;; (global-unset-key (kbd "M-TAB"))
+;; (global-unset-key (kbd "C-i"))
+;; (global-unset-key (kbd "M-s"))
+;; (global-unset-key (kbd "M-j"))
+;; (global-unset-key (kbd "M-i"))
+;; (global-unset-key (kbd "M-o"))
+;; (global-unset-key (kbd "M-I"))
+;; (global-unset-key (kbd "M-O"))
+
+(global-set-key (kbd "C-?") 'eldoc-fancy)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "C-j") 'browse-url-at-point)
 (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
 (global-set-key (kbd "C-x h") 'eldoc)
 (global-set-key (kbd "M-;") 'toggle-comment-on-line)
-(global-set-key (kbd "M-I") 'backward-global-mark)
 (global-set-key (kbd "M-N") (lambda () (interactive) (next-line 5)))
-(global-set-key (kbd "M-O") 'forward-global-mark)
 (global-set-key (kbd "M-P") (lambda () (interactive) (previous-line 5)))
 (global-set-key (kbd "M-TAB") 'eglot-format-buffer)
 (global-set-key (kbd "M-b") 'backward-to-separator)
@@ -225,4 +456,179 @@
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-q") 'fill-sentence)
 (global-set-key (kbd "M-s") 'counsel-git-grep)
-(global-set-key (kbd "TAB") 'eglot-format)
+(global-set-key (kbd "C-TAB") 'eglot-format)
+(global-set-key (kbd "M-`") 'keyboard-escape-quit)
+
+;; settings
+(global-display-line-numbers-mode)
+(global-hl-line-mode 1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(setq show-paren-delay 0)
+(setq eldoc-idle-delay 0.05)
+
+(setq linum-format "%4d\u2502")
+(setq separators-regexp "[\-'\"();:,.\\/?!@#%&*+= ]")
+
+
+;; theme
+
+(load-theme 'mox)
+
+(set-face-attribute 'line-number-current-line nil
+		    :foreground "#22DD22"
+		    :weight 'bold)
+(set-face-attribute 'line-number nil
+		    :foreground "#555555")
+(set-face-attribute 'show-paren-match nil
+		    :background "#555555")
+(set-face-attribute 'show-paren-match-expression nil
+		    :background "#555555")
+(set-face-attribute 'show-paren-match-expression nil
+		    :background "#555555")
+(set-face-attribute 'show-paren-mismatch nil
+		    :background "#702191")
+
+;; modeline
+(defun trim (string_content target_width left_portion right_portion)
+    (if (< (length string_content) target_width)
+	string_content
+      (concat
+       (substring string_content 0 (- (truncate (* left_portion target_width)) 1))
+       "…"
+       (substring string_content
+		  (- (length string_content) (truncate (* right_portion target_width)))
+		  (length string_content))
+       )
+      )
+    )
+
+(defun current-buffer-file-from-project (target_width)
+  "extracts the path to the current file based on eglot project root"
+  (let* ((filename (buffer-file-name))
+         (eglot-project (or (nth 2 (project-current))
+			    (expand-file-name default-directory)))
+	 (processed-buffer-name
+	  (if (and filename (file-exists-p filename) eglot-project)
+	      (file-relative-name filename eglot-project)
+	    (buffer-name))
+	  ))
+    (trim processed-buffer-name target_width 0.3 0.7)
+    )
+  )
+
+(defun get-modified-marker ()
+  "produces a marker   if the current buffer is modified 󰄱  otherwise"
+  (if (buffer-modified-p)
+      " "
+    " "
+    )
+  )
+
+(defun git+-branch (&optional buffer)
+  "Return Git branch for file of BUFFER.
+BUFFER defaults to the current buffer."
+  (let ((fn (buffer-file-name (or buffer (current-buffer)))))
+    (with-temp-buffer 
+      (and (eq (vc-backend fn)
+           'Git)
+       (eq (vc-git-command t 0 fn "branch" "--show-current") 0)
+       (buffer-substring-no-properties (point-min) (line-end-position 0))))))
+
+(defun borderize (content foreground background border)
+  (concat
+   (if (and border background)
+       (propertize
+	"▏"
+	'face `(:foreground ,border :background ,background)
+	)
+     "▏"
+     )
+   (if (and foreground background)
+     (propertize
+      content
+      'face `(:foreground ,foreground :background ,background :weight bold)
+      )
+     content
+   )
+   (if (and border background)
+       (propertize
+	"▕"
+	'face `(:foreground ,border :background ,background)
+	)
+     "▕"
+     )
+   )
+  )
+
+(defun mode-line-renderer (left right filler_char)
+  (let ((available-width
+         (- (window-total-width)
+            (+ (length (format-mode-line left))
+               (length (format-mode-line right))))))
+    (concat left
+            (string-replace " " filler_char (format (format "%%%ds" available-width) ""))
+            right)))
+
+(setq-default mode-line-format
+	      '(
+		(:eval (mode-line-renderer
+		 (concat
+		  (propertize (get-modified-marker) 'face
+			      '(:foreground "#eeeeee" :background "#2A2A2A"))
+		  (propertize "▕" 'face
+			      '(:foreground "#eeeeee" :background "#2A2A2A"))
+		  (propertize "─" 'face '(:foreground "#eeeeee"))
+		  (borderize (current-buffer-file-from-project
+			      (truncate (* .4 (window-total-width))))
+			     "#7FFF0F" "#2A2A2A" "#EEEEEE")
+		  )
+		 (concat
+		  (propertize "─" 'face '(:foreground "#EEEEEE"))
+		  (borderize " %l %c "
+			     "#0FFFDF" "#2A2A2A" "#EEEEEE")
+		  (propertize "─" 'face '(:foreground "#EEEEEE"))
+		  (let (git_branch (git+-branch))
+		    (if git_branch
+			(borderize (trim (or (git+-branch) "")
+					 (truncate (* .3 (window-total-width))) 1.0 0.0)
+				   "#FF38EB" "#2A2A2A" "#EEEEEE")
+		      ""))
+		  (propertize "─" 'face '(:foreground "#EEEEEE"))
+
+		  (if (bound-and-true-p flymake-mode)
+		   (borderize
+		    (concat
+		     (propertize 
+		      (concat
+		       (nth 1 (nth 1 (flymake--mode-line-counter :error)))
+		       " ")
+		      'face '(:foreground "#FC0D0D" :background "#2A2A2A" :weight bold))
+		     (propertize 
+		       (nth 1 (nth 1 (flymake--mode-line-counter :warning)))
+		      'face '(:foreground "#FCCC0D" :background "#2A2A2A" :weight bold)
+		      )
+		     (if (flymake--mode-line-counter :note)
+			 (propertize
+			  (concat
+			   " "
+			   (nth 1 (nth 1 (flymake--mode-line-counter :note)))
+			   )
+			  'face '(:foreground "#39FF12" :background "#2A2A2A" :weight bold)
+			  )
+		       ""
+		       )
+		     )
+		    nil "#1E1E1E" "#EEEEEE"
+		    )
+		   ""
+		   )
+		  )
+		 (propertize "─" 'face '(:foreground "#eeeeee"))
+		 )
+		       )
+		)
+	      )
+
+
