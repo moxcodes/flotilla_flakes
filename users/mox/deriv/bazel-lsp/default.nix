@@ -2,16 +2,17 @@
   lib,
   pkgs,
   stdenv,
-  fetchFromGitHub,
-  rustPlatform,
+  writeScript,
   pkg-config,
 }:
 let
   cargo_lock = builtins.readFile ./Cargo.lock;
 in
-pkgs.buildFHSUserEnv {
+pkgs.buildFHSEnv {
   name = "bazel-lsp";
   targetPkgs = pkgs:  (with pkgs; [
+    wget
+    unzip
     cargo
     cargo-edit
     openssl
@@ -22,11 +23,21 @@ pkgs.buildFHSUserEnv {
   multiPkgs = pkgs: (with pkgs; [
     zlib
   ]);
-  extraInstallCommands = ''
-  bazelisk build //:bazel-lsp -c opt
-  '';
-  runScript = ''
-  bazel-bin/bazel-lsp
+  runScript = writeScript "build-and-run-bazel-lsp" ''
+  if ! [ -f $HOME/.bazel-lsp/bazel-lsp-0.6.4/bazel-bin/bazel-lsp ]; then
+    echo "bazel-lsp not yet built (needs to build at invocation, sorry...)"
+    mkdir -p $HOME/.bazel-lsp/
+    cd $HOME/.bazel-lsp
+    echo "downloading from github..."
+    wget https://github.com/cameron-martin/bazel-lsp/archive/refs/tags/v0.6.4.zip > /dev/null
+    echo "decompressing..."
+    unzip v0.6.4.zip > /dev/null
+    cd bazel-lsp-0.6.4
+    echo "building..."
+    bazelisk build //:bazel-lsp -c opt
+    echo "build complete. Future invocations won't have to do this nonsense."
+  fi
+  $HOME/.bazel-lsp/bazel-lsp-0.6.4/bazel-bin/bazel-lsp $@
   '';
 }
 

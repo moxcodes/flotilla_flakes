@@ -11,7 +11,6 @@
   home.packages = with pkgs; [
     bazel-buildtools
     bat
-    # (callPackage ./deriv/bazel-lsp {})
     browsh
     fd
     figlet
@@ -34,6 +33,7 @@
     
     # Spacemacs refugees -- TODO move around to separate package
     libclang
+    (callPackage ./deriv/bazel-lsp {})
     nil
     rust-analyzer
     clippy
@@ -46,6 +46,7 @@
     protols
     vscode-langservers-extracted
     typescript-language-server
+    bash-language-server
   ];
   programs.git = {
     enable = true;
@@ -75,6 +76,7 @@
       epkgs.nerd-icons-completion
       epkgs.nix-mode
       epkgs.orderless
+      epkgs.python-mode
       epkgs.rust-mode
       epkgs.scala-mode
       epkgs.use-package

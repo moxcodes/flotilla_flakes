@@ -139,14 +139,57 @@
           (message "File '%s' successfully renamed to '%s'"
                    name (file-name-nondirectory new-name)))))))
 
-(defun eldoc-fancy (arg)
-  "`eldoc' but uses the echo area by default and a prefix will swap to a buffer."
-  (interactive "P")
-  (let ((eldoc-display-functions
-         (if arg '(eldoc-display-in-buffer) '(eldoc-display-in-echo-area))))
-    (eldoc t)))
+(defvar eldoc-fancy-active nil)
 
-;; packages - preamble
+(defun corfu-next-doc ()
+  "performs corfu-next and also summons documentation"
+  (interactive)
+  (corfu-next)
+  (corfu-info-documentation)
+  )
+
+(defun corfu-previous-doc ()
+  "performs corfu-next and also summons documentation"
+  (interactive)
+  (corfu-previous)
+  (corfu-info-documentation)
+  )
+
+(defun eldoc-fancy ()
+  "`eldoc' but uses the echo area by default and a prefix will swap to a buffer."
+  (interactive)
+  (setq eldoc-fancy-active
+	(if eldoc-fancy-active nil t))
+  (if eldoc-fancy-active nil (delete-other-windows))
+  (setq eldoc-display-functions
+         (if eldoc-fancy-active
+	   '(eldoc-display-in-buffer)
+	   '(eldoc-display-in-echo-area)
+	   ))
+  (setq eldoc t)
+  ;; (let ((eldoc-display-functions
+         ;; (if eldoc-fancy-active
+	   ;; '(eldoc-display-in-buffer)
+	   ;; '(eldoc-display-in-echo-area)
+	   ;; )))
+    ;; (eldoc t))
+  ;; )
+  ;; (if eldoc-fancy-active
+      ;; (progn
+	;; (define-key corfu-map (kbd "C-p") 'corfu-previous-doc)
+	;; (define-key corfu-map (kbd "C-n") 'corfu-next-doc)
+	;; (define-key corfu-map (kbd "M-p") 'corfu-previous-doc)
+	;; (define-key corfu-map (kbd "M-n") 'corfu-next-doc)
+	;; )
+      ;; (progn
+	;; (define-key corfu-map (kbd "C-p") 'corfu-previous-doc)
+	;; (define-key corfu-map (kbd "C-n") 'corfu-next-doc)
+	;; (define-key corfu-map (kbd "M-p") 'corfu-previous-doc)
+	;; (define-key corfu-map (kbd "M-n") 'corfu-next-doc)
+	;; )
+       ;; ))
+  ;; packages - preamble
+  )
 
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -355,14 +398,26 @@
 
 ;; languages
 
-(use-package bazel
-  :ensure t
-  :hook
-  (bazel-mode (lambda()
-		flymake-mode)))
-
   ;; eglot section
 (require 'eglot)
+
+(use-package bazel
+  :ensure t
+  :config
+  (add-to-list 'eglot-server-programs
+               '(bazel-mode . ("bazel-lsp")))
+  :hook
+  (bazel-mode (lambda()
+		flymake-mode
+		(eglot-ensure))))
+
+;; next deal is that we want to add some bazel utils:
+;; - suped up version of show-consuming-rule
+;;   (presently it only works for explicit rules not globs)
+;;   - can make something reasonable with falling back to just showing the build file using bazel-find-build-file
+;; - extract target at point - this I can probably hack with some basic string manip
+;; honestly... this LSP is sortof 'good enough' but it's significantly short of the
+;; professional bazel LSPs. Somethign to contribute to if I have a lot of extra time.
 
 (use-package jsonnet-mode
   :ensure t
@@ -393,6 +448,16 @@
 		flymake-mode
 		(eglot-ensure))))
 
+(use-package python-mode
+  :ensure t
+  :config
+  (add-to-list 'eglot-server-programs
+	       '(python-mode . ("pyright-langserver" "--stdio")))
+  :hook
+  (python-mode . (lambda()
+		flymake-mode
+		(eglot-ensure))))
+
 (use-package rust-mode
   :hook
   (rust-mode . (lambda()
@@ -414,6 +479,12 @@
 
 ;; extra hooks
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
+(add-hook 'sh-mode-hook
+	  '(lambda()
+	     flymake-mode
+	     (add-to-list 'eglot-server-programs
+			  '(sh-mode . ("bash-language-server" "start")))
+	     ))
 
 ;; keybindings
 ;; (global-unset-key (kbd "<down>"))
@@ -446,6 +517,7 @@
 (global-set-key (kbd "M-N") (lambda () (interactive) (next-line 5)))
 (global-set-key (kbd "M-P") (lambda () (interactive) (previous-line 5)))
 (global-set-key (kbd "M-TAB") 'eglot-format-buffer)
+(global-set-key (kbd "M-SPC") 'completion-at-point)
 (global-set-key (kbd "M-b") 'backward-to-separator)
 (global-set-key (kbd "M-f") 'forward-to-separator)
 (global-set-key (kbd "M-h") 'backward-kill-word)
