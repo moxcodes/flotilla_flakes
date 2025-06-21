@@ -32,6 +32,7 @@
             {
               home_manager_path = home-manager.outPath;
               sysname = "ares";
+              meta_conf = (import ./customizations.nix).laptop_size;
             })
         ];
       };
@@ -43,6 +44,7 @@
             {
               home_manager_path = home-manager.outPath;
               sysname = "ares";
+              meta_conf = (import ./customizations.nix).tablet_size;
             })
         ];
       };

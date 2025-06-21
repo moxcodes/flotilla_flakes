@@ -1,4 +1,4 @@
-{custom}: {
+{meta_conf}: {
   config,
   pkgs,
   ...
@@ -110,7 +110,7 @@ in {
       name = "Paper";
     };
     font.name = "InconsolataNerdFont";
-    font.size = custom.fontsize;
+    font.size = meta_conf.fontsize;
   };
 
   programs.git = {
@@ -143,7 +143,7 @@ in {
     enable = true;
     font = {
       name = "InconsolataNerdFont";
-      size = custom.fontsize + 0.0;
+      size = meta_conf.fontsize + 0.0;
     };
     settings = {
       cursor = "#00DD00";
@@ -869,7 +869,7 @@ in {
       };
       fonts = {
         names = ["InconsolataNerdFont"];
-        size = custom.fontsize + 0.0;
+        size = meta_conf.fontsize + 0.0;
       };
       bars = [
         {

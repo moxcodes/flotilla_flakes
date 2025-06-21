@@ -1,6 +1,7 @@
 {
   home_manager_path,
   sysname,
+  meta_conf
 }: {
   config,
   pkgs,
@@ -26,13 +27,7 @@
             value = (
               import ./${username}/home.nix
               {
-                custom =
-                  import ./${username}/customizations.nix
-                  {
-                    sysname = sysname;
-                    config = config;
-                    pkgs = pkgs;
-                  };
+                meta_conf = meta_conf;
               }
             );
           }
