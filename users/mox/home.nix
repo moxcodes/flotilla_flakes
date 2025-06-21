@@ -28,9 +28,9 @@ in
     ./modules/python_manager.nix
 
     # personal config factoring
-    ((import ./backend_dev_edc.nix {custom = custom; }) args)
-    ((import ./matrix.nix {custom = custom; }) args)
-    ((import ./shell.nix {custom = custom; }) args)    
+    ((import ./backend_dev_edc.nix {custom = meta_conf; }) args)
+    ((import ./matrix.nix {custom = meta_conf; }) args)
+    ((import ./shell.nix {custom = meta_conf; }) args)    
   ];
   python_manager = with pkgs; {
     enable = true;
