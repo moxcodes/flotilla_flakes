@@ -155,18 +155,48 @@
   (corfu-info-documentation)
   )
 
+(defun eldoc-test-delete-windows ()
+  "`eldoc' but uses the echo area by default and a prefix will swap to a buffer."
+  (interactive)
+  (progn
+    (setq eldoc-fancy-active
+	  (if eldoc-fancy-active nil t))
+    (delete-other-windows)      
+    )
+  )
+
 (defun eldoc-fancy ()
   "`eldoc' but uses the echo area by default and a prefix will swap to a buffer."
   (interactive)
-  (setq eldoc-fancy-active
-	(if eldoc-fancy-active nil t))
-  (if eldoc-fancy-active nil (delete-other-windows))
-  (setq eldoc-display-functions
-         (if eldoc-fancy-active
-	   '(eldoc-display-in-buffer)
-	   '(eldoc-display-in-echo-area)
-	   ))
-  (setq eldoc t)
+  (progn
+    (setq eldoc-fancy-active
+	  (if eldoc-fancy-active nil t))
+    (setq eldoc-display-functions
+	  (if eldoc-fancy-active '(eldoc-display-in-buffer) '(eldoc-display-in-echo-area)))
+    (if eldoc-fancy-active
+	(progn
+	  (define-key corfu-map (kbd "C-p") 'corfu-previous-doc)
+	  (define-key corfu-map (kbd "C-n") 'corfu-next-doc)
+	  (define-key corfu-map (kbd "M-p") 'corfu-previous-doc)
+	  (define-key corfu-map (kbd "M-n") 'corfu-next-doc)
+	  )
+      (progn
+	(define-key corfu-map (kbd "C-p") 'corfu-previous)
+	(define-key corfu-map (kbd "C-n") 'corfu-next)
+	(define-key corfu-map (kbd "M-p") 'corfu-previous)
+	(define-key corfu-map (kbd "M-n") 'corfu-next)
+	)
+      )
+    (if eldoc-fancy-active (eldoc t) (delete-other-windows))
+    )
+
+  ;; (setq eldoc-display-functions
+         ;; (if eldoc-fancy-active
+	   ;; '(eldoc-display-in-buffer)
+	   ;; '(eldoc-display-in-echo-area)
+	   ;; ))
+  ;; (setq eldoc t)
+
   ;; (let ((eldoc-display-functions
          ;; (if eldoc-fancy-active
 	   ;; '(eldoc-display-in-buffer)
@@ -174,20 +204,6 @@
 	   ;; )))
     ;; (eldoc t))
   ;; )
-  ;; (if eldoc-fancy-active
-      ;; (progn
-	;; (define-key corfu-map (kbd "C-p") 'corfu-previous-doc)
-	;; (define-key corfu-map (kbd "C-n") 'corfu-next-doc)
-	;; (define-key corfu-map (kbd "M-p") 'corfu-previous-doc)
-	;; (define-key corfu-map (kbd "M-n") 'corfu-next-doc)
-	;; )
-      ;; (progn
-	;; (define-key corfu-map (kbd "C-p") 'corfu-previous-doc)
-	;; (define-key corfu-map (kbd "C-n") 'corfu-next-doc)
-	;; (define-key corfu-map (kbd "M-p") 'corfu-previous-doc)
-	;; (define-key corfu-map (kbd "M-n") 'corfu-next-doc)
-	;; )
-       ;; ))
   ;; packages - preamble
   )
 
@@ -508,12 +524,12 @@
 ;; (global-unset-key (kbd "M-I"))
 ;; (global-unset-key (kbd "M-O"))
 
-(global-set-key (kbd "C-?") 'eldoc-fancy)
+;; (global-set-key (kbd "C-?") 'eldoc-fancy)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "C-j") 'browse-url-at-point)
 (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
-(global-set-key (kbd "C-x h") 'eldoc)
-(global-set-key (kbd "M-;") 'toggle-comment-on-line)
+(global-set-key (kbd "C-x h") 'eldoc-fancy)
+;; (global-set-key (kbd "M-;") 'toggle-comment-on-line)
 (global-set-key (kbd "M-N") (lambda () (interactive) (next-line 5)))
 (global-set-key (kbd "M-P") (lambda () (interactive) (previous-line 5)))
 (global-set-key (kbd "M-TAB") 'eglot-format-buffer)
