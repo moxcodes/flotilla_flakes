@@ -189,22 +189,6 @@
       )
     (if eldoc-fancy-active (eldoc t) (delete-other-windows))
     )
-
-  ;; (setq eldoc-display-functions
-         ;; (if eldoc-fancy-active
-	   ;; '(eldoc-display-in-buffer)
-	   ;; '(eldoc-display-in-echo-area)
-	   ;; ))
-  ;; (setq eldoc t)
-
-  ;; (let ((eldoc-display-functions
-         ;; (if eldoc-fancy-active
-	   ;; '(eldoc-display-in-buffer)
-	   ;; '(eldoc-display-in-echo-area)
-	   ;; )))
-    ;; (eldoc t))
-  ;; )
-  ;; packages - preamble
   )
 
 (require 'package)
@@ -419,13 +403,115 @@
 
 (use-package bazel
   :ensure t
-  :config
-  (add-to-list 'eglot-server-programs
-               '(bazel-mode . ("bazel-lsp")))
-  :hook
-  (bazel-mode (lambda()
-		flymake-mode
-		(eglot-ensure))))
+  )
+
+(defun bazel-show-consuming-rule-custom ()
+  "Customized from bazel-mode to make more flexible;
+Find the definition of the rule consuming the current file.
+The current buffer must visit a file, and the file must be in a
+Bazel workspace.  Use ‘xref-show-definitions-function’ to display
+the rule definition.  Right now, perform a best-effort attempt
+for finding the consuming rule by a textual search in the BUILD
+file."
+  (interactive)
+  (let* ((source-file (or buffer-file-name
+                          (user-error "Buffer doesn’t visit a file")))
+         (root (or (bazel--workspace-root source-file)
+                   (user-error "File is not in a Bazel workspace")))
+         (directory (or (bazel--package-directory source-file root)
+                        (user-error "File is not in a Bazel package")))
+         (package (or (bazel--package-name directory root)
+                      (user-error "File is not in a Bazel package")))
+         (build-file (or (bazel--locate-build-file directory)
+                         (user-error "No BUILD file found")))
+         (relative-file (file-relative-name source-file directory))
+         (case-fold-file (file-name-case-insensitive-p source-file))
+         (rule (or (bazel--consuming-rule-custom build-file relative-file
+						 case-fold-file nil)
+                   (user-error "No rule for file %s found" relative-file)))
+         ;; We press ‘xref-find-definitions’ into service for finding and
+         ;; showing the rule.  For that to work, our Xref backend must be found
+         ;; unconditionally.
+         (xref-backend-functions (list (lambda () 'bazel-mode))))
+    (xref-find-definitions
+     ;; Create a target identifier similar to what
+     ;; ‘xref-backend-identifier-at-point’ returns.
+     (propertize (bazel--canonical nil package rule)
+                 'bazel-mode-workspace root)))
+  nil)
+
+(defun extract-glob-strings (glob-definition-string)
+  (let (
+	(glob-contents-string (string-match "glob\(\[(.*)\]\)" glob-definition-string))
+	(glob-contents-split (split-string glob-contents-string ","))
+	)
+    (progn
+      )
+  )
+
+(defun bazel--consuming-rule-custom (build-file source-file case-fold-file only-tests)
+  "Customized from bazel-mode to make more flexible;
+Return the name of the rule in BUILD-FILE that consumes SOURCE-FILE.
+If CASE-FOLD-FILE is non-nil, ignore filename case when
+searching.  If ONLY-TESTS is non-nil, look only for test rules.
+Return nil if no consuming rule was found."
+  (cl-check-type build-file string)
+  (cl-check-type source-file string)
+  ;; Prefer a buffer that’s already visiting BUILD-FILE.
+  (bazel--with-file-buffer existing build-file
+    (unless existing (bazel-build-mode))  ; for correct syntax tables
+    (let ((case-fold-search nil)
+          (search-spaces-regexp nil))
+      (save-excursion
+        ;; Don’t widen; if the rule isn’t found within the accessible portion of
+        ;; the current buffer, that’s probably what the user wants.
+        (goto-char (point-min))
+        ;; We perform a simple textual search for rules with “srcs” attributes
+        ;; that contain references to SOURCE-FILE.  That’s in no way exact, but
+        ;; faster than invoking “bazel query”, and most BUILD files are regular
+        ;; enough for this approach to give acceptable results.
+        (cl-block nil
+          (while (let ((case-fold-search case-fold-file))
+                   (re-search-forward (rx-to-string `(seq (group (any ?\" ?\'))
+                                                          (? ?:) ,source-file
+                                                          (backref 1)))
+                                      nil t))
+            (let ((begin (match-beginning 0))
+                  (end (match-end 0)))
+              (goto-char begin)
+              (python-nav-up-list -1)  ; move to start of attribute value
+              (when (looking-back
+                     (rx symbol-start "srcs" (* blank) ?= (* blank))
+                     (line-beginning-position))
+                (when-let ((rule-name (bazel-mode-current-rule-name)))
+                  (when (or (not only-tests) (bazel--in-test-rule-p))
+                    (cl-return rule-name))))
+              ;; Ensure we don’t loop forever if we ended up in a weird place.
+              (goto-char end)))
+
+	  ;; fallback to first matching glob in a srcs
+	  (while (let ((case-fold-search case-fold-file))
+		   (re-search-forward "glob\([^\)]\)" nil t))
+            (let ((begin (match-beginning 0))
+                  (end (match-end 0))
+		  (globs (extract-glob-strings (match-string 0))))
+	      
+              (goto-char begin)
+              (python-nav-up-list -1)  ; move to start of attribute value
+              (when (looking-back
+                     (rx symbol-start "srcs" (* blank) ?= (* blank))
+                     (line-beginning-position))
+                (when-let ((rule-name (bazel-mode-current-rule-name)))
+		  (when
+
+		  
+                  (when (or (not only-tests) (bazel--in-test-rule-p))
+                    (cl-return rule-name))))
+              ;; Ensure we don’t loop forever if we ended up in a weird place.
+              (goto-char end)))
+
+	  )))))
+
 
 ;; next deal is that we want to add some bazel utils:
 ;; - suped up version of show-consuming-rule
