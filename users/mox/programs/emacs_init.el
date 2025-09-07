@@ -396,6 +396,12 @@
   (global-corfu-mode)
   (corfu-terminal-mode))
 
+(use-package vundo
+  :ensure t
+  :bind
+  ("C-/" . vundo)
+  )
+
 ;; languages
 
   ;; eglot section
@@ -440,14 +446,15 @@ file."
                  'bazel-mode-workspace root)))
   nil)
 
-(defun extract-glob-strings (glob-definition-string)
-  (let (
-	(glob-contents-string (string-match "glob\(\[(.*)\]\)" glob-definition-string))
-	(glob-contents-split (split-string glob-contents-string ","))
-	)
-    (progn
-      )
-  )
+;; (defun extract-glob-strings (glob-definition-string)
+;;   (let (
+;; 	(glob-contents-string (string-match "glob\(\[(.*)\]\)" glob-definition-string))
+;; 	(glob-contents-split (split-string glob-contents-string ","))
+;; 	)
+;;     (progn
+;;       )
+;;   )
+;; )
 
 (defun bazel--consuming-rule-custom (build-file source-file case-fold-file only-tests)
   "Customized from bazel-mode to make more flexible;
@@ -510,7 +517,7 @@ Return nil if no consuming rule was found."
               ;; Ensure we don’t loop forever if we ended up in a weird place.
               (goto-char end)))
 
-	  )))))
+	    ))))))
 
 
 ;; next deal is that we want to add some bazel utils:
