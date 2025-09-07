@@ -9,27 +9,98 @@
 #    ./modules/spacemacs.nix
   ];
   home.packages = with pkgs; [
-    bazel-buildtools
+    ast-grep
     bat
+    bazel-buildtools
+    bitwarden-cli
     browsh
+    csvkit
+    csvlens
+    dasel
+    erdtree
+    eza
     fd
     figlet
+    file
     fish
+    font-awesome
     fzf
-    git
-    gitmux
     gnumake
+    hck
+    hyperfine
+    ictree
+    ispell
+    nap
     nerd-fonts.inconsolata
     nerd-fonts.symbols-only
-    jq
-    # TODO - try to make this a part of emacs dependencies somehow
-    ispell
-    file
-    font-awesome
+    plocate
+    progress
+    pv
+    reflex
     ripgrep
-    silver-searcher
+    tealdeer
+    tre-command
+    sad
+    viddy
+    z-lua
+    # hardware
+    brightnessctl
+    lshw
+    # version control
+    gh
+    gh-dash
+    git-extras
+    gh-f
+    git
+    gitmux
+    kickstart
+    # media
+    asciinema
+    # web
+    httpie
+    # communication
+    mutt
+    # terminal emulation
     tmux
+    # file management
+    bupstash
+    extundelete
+    rsnapshot
+    sftpman
+    # disks
+    bashmount
+    dfc
+    gdu
+    # system
+    ctop
+    htop
+    inxi
+    iotop
+    neofetch
+    procs
+    sysz
+    # containers
+    dive
+    oxker
+    # cluster management
+    cloudlens
+    k9s
+    kubectx
+    # data munging
+    jid
+    jq
+    pup
     yq
+    # networking
+    bluetuith
+    gping
+    netscanner
+    oha
+    termshark
+    # reversing
+    binsider
+    blink
+    hexyl
     
     # Spacemacs refugees -- TODO move around to separate package
     libclang
@@ -81,6 +152,7 @@
       epkgs.scala-mode
       epkgs.use-package
       epkgs.vertico
+      epkgs.vundo
     ];
     extraConfig = (builtins.readFile ./programs/emacs_init.el);
   };
@@ -231,12 +303,15 @@
     plugins = [
       {
         name = "fzf";
-        src = pkgs.fetchFromGitHub {
-          owner = "PatrickF1";
-          repo = "fzf.fish";
-          rev = "e5d54b93cd3e096ad6c2a419df33c4f50451c900";
-          sha256 = "5cO5Ey7z7KMF3vqQhIbYip5JR6YiS2I9VPRd6BOmeC8=";
-        };
+        src = pkgs.fishPlugins.fzf;
+      }
+      {
+        name = "forgit";
+        src = pkgs.fishPlugins.forgit;
+      }
+      {
+        name = "fifc";
+        src = pkgs.fishPlugins.fifc;
       }
     ];
   };

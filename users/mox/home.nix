@@ -31,6 +31,7 @@ in
     ((import ./backend_dev_edc.nix {custom = meta_conf; }) args)
     ((import ./matrix.nix {custom = meta_conf; }) args)
     ((import ./shell.nix {custom = meta_conf; }) args)    
+    ((import ./media.nix {custom = meta_conf; }) args)    
   ];
   python_manager = with pkgs; {
     enable = true;
@@ -52,6 +53,7 @@ in
     dconf
     dmenu
     dmidecode
+    dwarf-fortress
     feh
     firefox-bin
     glxinfo
