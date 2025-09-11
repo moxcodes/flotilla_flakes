@@ -19,9 +19,9 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
   in {
     formatter = forAllSystems (system: let
-      pkgs = import nixpkgs {inherit system;};
-    in
-      pkgs.alejandra);
+        pkgs = import nixpkgs {inherit system;};
+      in
+        pkgs.alejandra);
     nixosConfigurations = {
       rocinante = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -49,5 +49,26 @@
         ];
       };
     };
+    homeConfigurations = forAllSystems(system:
+      let
+        pkgs = import nixpkgs {inherit system;};
+      in {
+        jordan-moxon-shell =
+          let
+            meta_conf = (import ./customizations.nix).laptop_size;
+          in
+            home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              imports = [
+                ./users/mox/modules/python_manager.nix
+                ((import ./users/mox/backend_dev_edc.nix {custom = meta_conf; }) pkgs.lib pkgs)
+                ((import ./users/mox/shell.nix {custom = meta_conf; })  pkgs.lib pkgs)
+              ];
+              home.username = "jordan.moxon";
+              home.homeDirectory = "/home/jordan.moxon";
+              home.stateVersion = "22.11";
+              programs.home-manager.enable = true;
+            };
+      });
   };
 }
