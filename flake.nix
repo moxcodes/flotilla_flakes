@@ -49,26 +49,33 @@
         ];
       };
     };
-    homeConfigurations = forAllSystems(system:
-      let
-        pkgs = import nixpkgs {inherit system;};
-      in {
-        jordan-moxon-shell =
-          let
-            meta_conf = (import ./customizations.nix).laptop_size;
-          in
-            home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
-              imports = [
-                ./users/mox/modules/python_manager.nix
-                ((import ./users/mox/backend_dev_edc.nix {custom = meta_conf; }) pkgs.lib pkgs)
-                ((import ./users/mox/shell.nix {custom = meta_conf; })  pkgs.lib pkgs)
-              ];
-              home.username = "jordan.moxon";
-              home.homeDirectory = "/home/jordan.moxon";
-              home.stateVersion = "22.11";
-              programs.home-manager.enable = true;
-            };
-      });
+    # TODO there's some clever usage of forAllSystems that's supposed to make this
+    # easier, but I haven't gotten that to work yet so hack hack hack
+
+    # also probably all this crap should just be factored into other flakes
+    # hack hack hack hack
+
+    homeConfigurations = {
+      "jordan-moxon-shell" =
+        let
+          pkgs = nixpkgs.legacyPackages.x86-64-linux;
+        in
+          home-manager.lib.homeManagerConfiguration {
+            pkgs = pkgs;
+            modules = [
+              ./users/mox/home-jordan-moxon-shell.nix
+            ];
+          };
+      "aarch64-darwin"."jordan-moxon-shell" =
+        let
+          pkgs = nixpkgs.legacyPackages.x86-64-linux;
+        in
+          home-manager.lib.homeManagerConfiguration {
+            pkgs = pkgs;
+            modules = [
+              ./users/mox/home-jordan-moxon-shell.nix
+            ];
+          };
+    };
   };
 }

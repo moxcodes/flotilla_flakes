@@ -45,6 +45,7 @@ in
   };
   home.packages = with pkgs; [
     age
+    aseprite
     awscli2
     alsa-utils
     bemenu
