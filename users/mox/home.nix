@@ -29,7 +29,7 @@ in
 
     # personal config factoring
     ((import ./backend_dev_edc.nix {custom = meta_conf; }) args)
-    ((import ./matrix.nix {custom = meta_conf; }) args)
+    ((import ./coms.nix {custom = meta_conf; }) args)
     ((import ./shell.nix {custom = meta_conf; }) args)    
     ((import ./media.nix {custom = meta_conf; }) args)    
   ];

@@ -3,8 +3,9 @@ with lib;
 {
   config = {
     home.packages = with pkgs; [
-      matrix-commander-rs
       element-web
+      irssi
+      matrix-commander-rs
       signal-desktop
     ];
   };
