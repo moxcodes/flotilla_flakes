@@ -567,6 +567,26 @@ Return nil if no consuming rule was found."
 		flymake-mode
 		(eglot-ensure))))
 
+(use-package protobuf-mode
+  :ensure t
+  :config
+  (add-to-list 'eglot-server-programs
+	       '(protobuf-mode . ("protols")))
+  :hook
+  (protobuf-mode . (lambda()
+		flymake-mode
+		(eglot-ensure))))
+
+(use-package typescript-mode
+  :ensure t
+  :config
+  (add-to-list 'eglot-server-programs
+	       '(typescript-mode . ("typescript-language-server" "--stdio")))
+  :hook
+  (typescript-mode . (lambda()
+		flymake-mode
+		(eglot-ensure))))
+
 (use-package rust-mode
   :hook
   (rust-mode . (lambda()

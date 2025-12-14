@@ -147,9 +147,11 @@
       epkgs.nerd-icons-completion
       epkgs.nix-mode
       epkgs.orderless
+      epkgs.protobuf-mode
       epkgs.python-mode
       epkgs.rust-mode
       epkgs.scala-mode
+      epkgs.typescript-mode
       epkgs.use-package
       epkgs.vertico
       epkgs.vundo
