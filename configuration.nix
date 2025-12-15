@@ -21,9 +21,6 @@
   boot.kernelParams = ["resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141"];
   boot.resumeDevice = "/dev/disk/by-uuid/3778fe96-f599-496a-b760-2c6bf7414141";
   services.logind.lidSwitch = "hibernate";
-  services.logind.extraConfig = ''
-    HandleLidSwitch=hibernate
-  '';
 
   networking.hostName = "rocinante"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.

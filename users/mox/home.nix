@@ -57,7 +57,7 @@ in
     dwarf-fortress
     feh
     firefox-bin
-    glxinfo
+    mesa-demos
     gimp
     grim
     nerd-fonts.inconsolata
