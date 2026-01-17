@@ -45,6 +45,9 @@ in
   };
   home.packages = with pkgs; [
     age
+    android-tools
+    waydroid
+    waydroid-helper
     aseprite
     awscli2
     alsa-utils
@@ -80,6 +83,7 @@ in
     xdg-utils
     xf86_input_wacom
     xorg.xev
+    xorg.libxcb
     wlr-randr
     zathura
     zoom-us
