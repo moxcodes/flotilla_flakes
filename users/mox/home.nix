@@ -45,7 +45,7 @@ in
   };
   home.packages = with pkgs; [
     age
-    aseprite
+#    (callPackage aseprite {stdenv = pkgs.clangStdenv; })
     awscli2
     alsa-utils
     bemenu
@@ -94,6 +94,10 @@ in
   gtk = {
     enable = true;
     theme = {
+      package = pkgs.plata-theme;
+      name = "Plata-Noir";
+    };
+    gtk4.theme = {
       package = pkgs.plata-theme;
       name = "Plata-Noir";
     };
@@ -207,7 +211,7 @@ in
       mainBar = {
         layer = "top";
         position = "top";
-        height = 10;
+        height = 20;
         output = [
           "eDP-1"
           "HDMI-A-1"
@@ -215,15 +219,22 @@ in
         modules-left = ["sway/workspaces"];
         modules-right = ["clock" "battery"];
         modules-center = [];
+        clock = {
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+		        format = "{:%F|%T}";
+		        format-alt = "{:%F|%T}";
+		        interval = 1;
+        };
+        battery.format = "{capacity}%";
         "sway/workspaces" = {
-          format = "{name}{icon}";
+          format = " {name}{icon}";
           on-click = "activate";
           format-icons = {
             "1" = " ";
             "2" = " ";
             "3" = " ";
             "4" = " ";
-            "5" = " ⊙";
+            "5" = "⊙ ";
             "6" = " ";
             "7" = " ";
             "8" = " ";
@@ -232,7 +243,7 @@ in
             "11" = " ";
             "12" = " ";
             "13" = " ";
-            "14" = " ⊙";
+            "14" = "⊙ ";
             "15" = " ";
             "16" = " ";
             "17" = " ";
@@ -245,23 +256,24 @@ in
       * {
         font-family: InconsolataNerdFont;
         padding: 0 0;
-        margin: -2 0;
+        margin: -2 3;
         transition: all 0.0s ease;
+        font-size: 16px;
       }
 
       #workspaces {
-        padding: 0 4;
+        padding: 0 0;
         margin: -2 0;
       }
       #workspaces button {
         padding: 0 0;
-        margin: -2 -1;
+        margin: -2 0;
         box-shadow: inset 0px 9px 0px 1px #008800,
                     inset 0px -9px 0px 1px #008800;
       }
-      #workspacesB button.visible {
+      #workspaces button.visible {
         padding: 0 0;
-        margin: -2 -1;
+        margin: -2 0;
         color: #00ff00;
         box-shadow: inset 0px 9px 0px 1px #00ff00,
                     inset 0px -9px 0px 1px #00ff00;

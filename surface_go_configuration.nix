@@ -52,7 +52,7 @@
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd \"sway --unsupported-gpu -d\"";
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd \"sway --unsupported-gpu -d\"";
       user = "greeter";
     };
   };
@@ -66,7 +66,7 @@
     packages = with pkgs; [];
   };
 
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   security.polkit.enable = true;
   services.pipewire = {
@@ -88,6 +88,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    brightnessctl    
     cargo
     clang
     docker
@@ -95,7 +96,7 @@
     fish
     git
     glib
-    greetd.tuigreet
+    tuigreet
     gparted
     lm_sensors
     lshw
@@ -123,7 +124,6 @@
   };
 
   programs.fish.enable = true;
-  programs.light.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;

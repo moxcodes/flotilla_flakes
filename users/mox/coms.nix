@@ -3,8 +3,8 @@ with lib;
 {
   config = {
     home.packages = with pkgs; [
-      element-web
       irssi
+      fluffychat
       matrix-commander-rs
       signal-desktop
     ];

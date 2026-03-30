@@ -20,7 +20,7 @@
   security.protectKernelImage = false;
   boot.kernelParams = ["resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141"];
   boot.resumeDevice = "/dev/disk/by-uuid/3778fe96-f599-496a-b760-2c6bf7414141";
-  services.logind.lidSwitch = "hibernate";
+  services.logind.settings.Login.HandleLidSwitch = "hibernate";
 
   networking.hostName = "rocinante"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -53,7 +53,7 @@
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd \"sway --unsupported-gpu -d\"";
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd \"sway --unsupported-gpu -d\"";
       user = "greeter";
     };
   };
@@ -80,8 +80,8 @@
   services.xserver.enable = true;
   services.xserver.videoDrivers = ["nvidia"];
   services.blueman.enable = true;
-  hardware.opengl.enable = true;
-  hardware.opengl.driSupport32Bit = true;
+  hardware.graphics.enable = true;
+  hardware.graphics.enable32Bit = true;
 
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
@@ -106,15 +106,15 @@
 
   # Configure keymap in X11
   services.xserver = {
-    layout = "us";
-    xkbVariant = "";
+    xkb.layout = "us";
+    xkb.variant = "";
   };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   security.polkit.enable = true;
   services.pipewire = {
@@ -159,13 +159,14 @@
     __GLX_VENDOR_LIBARARY_NAME = "nvidia";
   };
   environment.systemPackages = with pkgs; [
+    brightnessctl
     cargo
     clang
     docker
     fish
     git
     glib
-    greetd.tuigreet
+    tuigreet
     gparted
     lm_sensors
     lshw
@@ -178,13 +179,12 @@
     wget
   ];
 
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     nerd-fonts.inconsolata
     nerd-fonts.symbols-only
   ];
 
   programs.fish.enable = true;
-  programs.light.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
