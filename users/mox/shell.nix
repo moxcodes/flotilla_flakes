@@ -76,7 +76,7 @@
     htop
     inxi
     iotop
-    neofetch
+    fastfetch
     procs
     sysz
     # containers
@@ -113,22 +113,40 @@
     go-jsonnet
     gopls
     metals
+    marksman
+    basedpyright
+    ruff
+    jdt-language-server
     pyright
     protols
     vscode-langservers-extracted
     typescript-language-server
     bash-language-server
+    kotlin-language-server
+    texlab
+    vale-ls
+    tailwindcss-language-server
+    svelte-language-server
+    terraform-ls
+    verible
+    wasm-language-tools
+    yaml-language-server
+    lemminx
+    haskell-language-server
   ];
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+  };
   programs.git = {
     enable = true;
-    userName = "Jordan Moxon";
-    userEmail = custom.email;
     ignores = [
       "*~"
       ".*"
     ];
-    delta.enable = true;
-    extraConfig = {
+    settings = {
+      user.name = "Jordan Moxon";
+      user.email = custom.email;
       init.defaultBranch = "main";
     };
   };
@@ -138,16 +156,19 @@
   programs.emacs = {
     enable = true;
     extraPackages = epkgs: [
+      epkgs.acm-terminal
       epkgs.bazel
       epkgs.consult
       epkgs.corfu-terminal
       epkgs.jsonnet-mode
+      epkgs.lsp-bridge
       epkgs.marginalia
       epkgs.markdown-mode
       epkgs.nerd-icons-completion
       epkgs.nix-mode
       epkgs.orderless
       epkgs.protobuf-mode
+      epkgs.popon
       epkgs.python-mode
       epkgs.rust-mode
       epkgs.scala-mode

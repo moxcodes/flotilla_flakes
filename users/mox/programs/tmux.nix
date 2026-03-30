@@ -98,7 +98,7 @@ in {
       #[noreverse,fg=${builtins.elemAt right_fg_colors 1},bg=${builtins.elemAt right_bg_colors 1}]\
       #(python3 $syncthing_monitor_py --bg-color ${builtins.elemAt right_bg_colors 1} --fg-color ${builtins.elemAt right_fg_colors 1})\
       #[reverse,fg=${builtins.elemAt right_bg_colors 0}, bg=${builtins.elemAt right_bg_colors 1}]${right_separator}\
-      #[noreverse,fg=${builtins.elemAt right_fg_colors 0}, bg=${builtins.elemAt right_bg_colors 0}]%Y_%m_%d|%H:%M:%S"
+      #[noreverse,fg=${builtins.elemAt right_fg_colors 0}, bg=${builtins.elemAt right_bg_colors 0}]%Y-%m-%d|%H:%M:%S"
 
       set-window-option -g window-status-current-format "\
       #[fg=colour255, bg=colour40]▏\

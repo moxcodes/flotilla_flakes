@@ -3,13 +3,24 @@
 (defun forward-to-separator()
   "Move to the next separator like in the every NORMAL editor"
   (interactive)
-  (let ((my-pos (re-search-forward separators-regexp)))
-    (goto-char my-pos)))
+  (let ((my-pos (re-search-forward
+		 (concat
+		  "\\("
+		  separators-regexp
+		  "+[[:word:]]\\)\\|[a-z0-9][A-Z]" )
+		 )))
+    (goto-char (- my-pos 1))))
 
 (defun backward-to-separator()
   "Move to the previous separator like in the every NORMAL editor"
   (interactive)
-  (let ((my-pos (re-search-backward separators-regexp)))
+  (let ((my-pos (re-search-backward
+		 (concat
+		  "\\([[:word:]]"
+		  separators-regexp
+		  "+\\)\\|[a-z0-9][A-Z]"
+		  )
+		 )))
     (goto-char my-pos)))
 
 
@@ -191,6 +202,23 @@
     )
   )
 
+(defvar lsp-doc-ergo-active nil)
+
+(defun lsp-doc-ergo ()
+  "calls lsp doc show, then ensures that the doc buffer is open"
+  (interactive)
+  (progn
+    (lsp-bridge-show-documentation)
+    (if (get-buffer "*lsp-bridge-doc*")
+	(progn
+	  (switch-to-buffer-other-window "*lsp-bridge-doc*")
+	  (window-resize (selected-window) (- (/ (frame-height) 5) (window-size)))
+	  (select-window (old-selected-window))
+	  )
+	)
+    )
+  )
+
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
@@ -362,6 +390,30 @@
 	  (124 . orderless-regexp)))
   )
 
+(use-package 'yasnippet
+  :ensure t
+  :init
+  (yas-global-mode 1)
+  )
+
+(use-package 'lsp-bridge
+  :ensure t
+  :after yasnippet
+  :init
+  (global-lsp-bridge-mode)
+  )
+
+(use-package 'popon
+  :ensure t)
+
+(use-package 'acm-terminal
+  :ensure t)
+
+(unless (display-graphic-p)
+  (add-to-list 'load-path "<path-to-acm-terminal>")
+  (with-eval-after-load 'acm
+    (require 'acm-terminal)))
+
 (use-package marginalia
   :ensure t
   :after vertico
@@ -404,8 +456,8 @@
 
 ;; languages
 
-  ;; eglot section
-(require 'eglot)
+  ;; eglot section -- temporarily disabled to try lsp-bridge
+;; (require 'eglot)
 
 (use-package bazel
   :ensure t
@@ -545,17 +597,21 @@ Return nil if no consuming rule was found."
   :hook
   (jsonnet-mode . (lambda()
 		    flymake-mode
-                    (eglot-ensure))))
+                    ;; (eglot-ensure)
+		    )))
 
 (use-package nix-mode
   :ensure t
   :config
-  (add-to-list 'eglot-server-programs
-	       '(nix-mode . ("nil" "--stdio")))
+  ;; (add-to-list 'eglot-server-programs
+  ;; 	       '(nix-mode . ("nil" "--stdio"))
+  (setq lsp-bridge-nix-lsp-server nil)
+  
   :hook
   (nix-mode . (lambda()
 		flymake-mode
-		(eglot-ensure))))
+		;; (eglot-ensure)
+		)))
 
 (use-package python-mode
   :ensure t
@@ -565,7 +621,8 @@ Return nil if no consuming rule was found."
   :hook
   (python-mode . (lambda()
 		flymake-mode
-		(eglot-ensure))))
+		;; (eglot-ensure)
+		)))
 
 (use-package protobuf-mode
   :ensure t
@@ -575,7 +632,8 @@ Return nil if no consuming rule was found."
   :hook
   (protobuf-mode . (lambda()
 		flymake-mode
-		(eglot-ensure))))
+		;; (eglot-ensure)
+		)))
 
 (use-package typescript-mode
   :ensure t
@@ -585,20 +643,23 @@ Return nil if no consuming rule was found."
   :hook
   (typescript-mode . (lambda()
 		flymake-mode
-		(eglot-ensure))))
+		;; (eglot-ensure)
+		)))
 
 (use-package rust-mode
   :hook
   (rust-mode . (lambda()
 		 flymake-mode
-		 (eglot-ensure))))
+		 ;; (eglot-ensure)
+		 )))
 
 (use-package scala-mode
   :interpreter ("scala" . scala-mode)
   :hook
   (scala-mode (lambda()
 		flymake-mode
-		(eglot-ensure))))
+		;; (eglot-ensure)
+		)))
 
 (use-package markdown-mode
   :ensure t
@@ -637,11 +698,13 @@ Return nil if no consuming rule was found."
 ;; (global-unset-key (kbd "M-I"))
 ;; (global-unset-key (kbd "M-O"))
 
+(global-unset-key (kbd "M-l"))
+
 ;; (global-set-key (kbd "C-?") 'eldoc-fancy)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "C-j") 'browse-url-at-point)
 (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
-(global-set-key (kbd "C-x h") 'eldoc-fancy)
+(global-set-key (kbd "M-H") 'lsp-doc-ergo)
 ;; (global-set-key (kbd "M-;") 'toggle-comment-on-line)
 (global-set-key (kbd "M-N") (lambda () (interactive) (next-line 5)))
 (global-set-key (kbd "M-P") (lambda () (interactive) (previous-line 5)))
@@ -657,8 +720,14 @@ Return nil if no consuming rule was found."
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-q") 'fill-sentence)
 (global-set-key (kbd "M-s") 'counsel-git-grep)
-(global-set-key (kbd "C-TAB") 'eglot-format)
+(global-set-key (kbd "C-TAB") 'lsp-bridge-code-format)
 (global-set-key (kbd "M-`") 'keyboard-escape-quit)
+(global-set-key (kbd "M-.") 'lsp-bridge-find-def)
+(global-set-key (kbd "M-,") 'lsp-bridge-find-def-return)
+(global-set-key (kbd "C-.") 'lsp-bridge-find-impl)
+(global-set-key (kbd "C-,") 'lsp-bridge-find-impl-return)
+(global-set-key (kbd "M-L") 'lsp-bridge-peek)
+(global-set-key (kbd "M-l .") 'lsp-bridge-peek-through)
 
 ;; settings
 (global-display-line-numbers-mode)
@@ -666,11 +735,23 @@ Return nil if no consuming rule was found."
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+;; this should probably be in the use-package, but didn't work??
+(yas-global-mode 1)
+(global-lsp-bridge-mode)
+(setq lsp-bridge-enable-inlay-hint t)
+(setq lsp-bridge-enable-hover-diagnostic t)
+(setq lsp-bridge-python-multi-lsp-server "basedpyright_ruff")
+(setq lsp-bridge-markdown-lsp-server "marksman")
+(setq lsp-bridge-diagnostic-fetch-idle 0.05)
+(setq acm-backend-lsp-show-progress t)
+
 (setq show-paren-delay 0)
 (setq eldoc-idle-delay 0.05)
+(setq eglot-sync-connect 0)
 
 (setq linum-format "%4d\u2502")
-(setq separators-regexp "[\-'\"();:,.\\/?!@#%&*+= ]")
+(setq separators-regexp "\\([\-_'\\\"(){};:,.\\/?!@#%&*+=\n]\\|[[:space:]]\\|[][]\\)")
+(setq case-fold-search nil)
 
 
 ;; theme
@@ -690,6 +771,10 @@ Return nil if no consuming rule was found."
 		    :background "#555555")
 (set-face-attribute 'show-paren-mismatch nil
 		    :background "#702191")
+(set-face-attribute 'acm-terminal-default-face nil
+		    :background "#444444")
+(set-face-attribute 'acm-terminal-select-face nil
+		    :background "#444444")
 
 ;; modeline
 (defun trim (string_content target_width left_portion right_portion)

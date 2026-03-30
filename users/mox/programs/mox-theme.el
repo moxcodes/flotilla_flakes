@@ -52,6 +52,8 @@
    `(font-lock-variable-name-face ((t (:foreground ,mox-var))))
    `(font-lock-type-face ((t (:foreground ,mox-type))))
    `(font-lock-warning-face ((t (:foreground ,mox-warning :bold t))))
+   '(acm-terminal-default-face ((t (:foreground "#44FF44" :background "#1A1A1A"))))
+   '(acm-terminal-select-face ((t (:foreground "#44FF44" :background "#444444"))))
   ))
 
 (provide-theme 'mox)
