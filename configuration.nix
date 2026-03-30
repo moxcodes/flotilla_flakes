@@ -198,6 +198,7 @@
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
   virtualisation.docker.enable = true;
+  virtualisation.waydroid.enable = true;
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [

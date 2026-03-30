@@ -46,6 +46,9 @@ in
   home.packages = with pkgs; [
     age
 #    (callPackage aseprite {stdenv = pkgs.clangStdenv; })
+    android-tools
+    waydroid
+    waydroid-helper
     awscli2
     alsa-utils
     bemenu
@@ -80,6 +83,7 @@ in
     xdg-utils
     xf86_input_wacom
     xorg.xev
+    xorg.libxcb
     wlr-randr
     zathura
     zoom-us

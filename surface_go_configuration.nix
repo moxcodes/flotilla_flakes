@@ -113,9 +113,8 @@
   services.auto-cpufreq.enable = true;
   services.auto-cpufreq.settings = {
     battery = {
-      governor = "powersave";
+      governor = "performance";
       turbo = "never";
-      scaling_max_freq = "800000";
     };
     charger = {
       governor = "performance";
@@ -148,6 +147,7 @@
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
   virtualisation.docker.enable = true;
+  virtualisation.waydroid.enable = true;
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
