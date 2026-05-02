@@ -95,23 +95,26 @@ in
   home.stateVersion = "22.11";
   programs.home-manager.enable = true;
 
-  gtk = {
-    enable = true;
-    theme = {
-      package = pkgs.plata-theme;
-      name = "Plata-Noir";
+  gtk =
+    let gtk_theme = {
+          package = pkgs.plata-theme;
+          name = "Plata-Noir";
+        };
+    in
+    {
+      enable = true;
+      theme = gtk_theme;
+      colorScheme = "dark";
+      gtk3.theme = gtk_theme;
+      gtk4.theme = gtk_theme;
+      gtk4.colorScheme = "dark";
+      iconTheme = {
+        package = pkgs.paper-icon-theme;
+        name = "Paper";
+      };
+      font.name = "InconsolataNerdFont";
+      font.size = meta_conf.fontsize;
     };
-    gtk4.theme = {
-      package = pkgs.plata-theme;
-      name = "Plata-Noir";
-    };
-    iconTheme = {
-      package = pkgs.paper-icon-theme;
-      name = "Paper";
-    };
-    font.name = "InconsolataNerdFont";
-    font.size = meta_conf.fontsize;
-  };
 
   # programs.firefox = {
   #   profiles.mox = {

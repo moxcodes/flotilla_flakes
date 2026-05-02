@@ -162,6 +162,7 @@
       epkgs.corfu-terminal
       epkgs.jsonnet-mode
       epkgs.lsp-bridge
+      epkgs.magit
       epkgs.marginalia
       epkgs.markdown-mode
       epkgs.nerd-icons-completion
@@ -176,6 +177,7 @@
       epkgs.use-package
       epkgs.vertico
       epkgs.vundo
+      epkgs.xclip
     ];
     extraConfig = (builtins.readFile ./programs/emacs_init.el);
   };
