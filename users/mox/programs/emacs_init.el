@@ -3,26 +3,31 @@
 (defun forward-to-separator()
   "Move to the next separator like in the every NORMAL editor"
   (interactive)
-  (let ((my-pos (re-search-forward
-		 (concat
-		  "\\("
-		  separators-regexp
-		  "+[[:word:]]\\)\\|[a-z0-9][A-Z]" )
-		 )))
-    (goto-char (- my-pos 1))))
+  (let ((case-fold-search nil))
+    (let ((my-pos (re-search-forward
+		   (concat
+		    "\\("
+		    separators-regexp
+		    "+[[:word:]]\\)\\|[a-z0-9][A-Z]" )
+		   )))
+      (goto-char (- my-pos 1)))
+    )
+  )
 
 (defun backward-to-separator()
   "Move to the previous separator like in the every NORMAL editor"
   (interactive)
-  (let ((my-pos (re-search-backward
+  (let ((case-fold-search nil))
+    (let ((my-pos (re-search-backward
 		 (concat
 		  "\\([[:word:]]"
 		  separators-regexp
 		  "+\\)\\|[a-z0-9][A-Z]"
 		  )
 		 )))
-    (goto-char my-pos)))
-
+    (goto-char my-pos))
+  )
+)
 
 (defun forward-to-separator-select()
   "Move to the next separator like in the every NORMAL editor"
@@ -223,6 +228,9 @@
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(global-so-long-mode 1)
+
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -233,6 +241,12 @@
 (setq use-package-always-ensure t)
 
 ;; packages - use-package declarations
+
+(use-package xclip
+  :ensure t)
+
+(use-package magit
+  :ensure t)
 
 ;; Enable Vertico.
 (use-package vertico
@@ -664,8 +678,7 @@ Return nil if no consuming rule was found."
 (use-package markdown-mode
   :ensure t
   :init
-  (setq markdown-command "multimarkdown")
-  (setq markdown-hide-markup t))
+  (setq markdown-command "multimarkdown"))
 
 ;; extra hooks
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
@@ -719,7 +732,7 @@ Return nil if no consuming rule was found."
 (global-set-key (kbd "M-o") 'forward-local-mark)
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-q") 'fill-sentence)
-(global-set-key (kbd "M-s") 'counsel-git-grep)
+(global-set-key (kbd "M-s") 'consult-ripgrep)
 (global-set-key (kbd "C-TAB") 'lsp-bridge-code-format)
 (global-set-key (kbd "M-`") 'keyboard-escape-quit)
 (global-set-key (kbd "M-.") 'lsp-bridge-find-def)
@@ -728,6 +741,10 @@ Return nil if no consuming rule was found."
 (global-set-key (kbd "C-,") 'lsp-bridge-find-impl-return)
 (global-set-key (kbd "M-L") 'lsp-bridge-peek)
 (global-set-key (kbd "M-l .") 'lsp-bridge-peek-through)
+(global-set-key (kbd "C-x C-f") 'consult-fd)
+(global-set-key (kbd "C-x f") 'find-file)
+(global-set-key (kbd "C-x C-b") 'consult-outline)
+
 
 ;; settings
 (global-display-line-numbers-mode)
@@ -738,12 +755,16 @@ Return nil if no consuming rule was found."
 ;; this should probably be in the use-package, but didn't work??
 (yas-global-mode 1)
 (global-lsp-bridge-mode)
+(global-auto-revert-mode 1)
 (setq lsp-bridge-enable-inlay-hint t)
 (setq lsp-bridge-enable-hover-diagnostic t)
 (setq lsp-bridge-python-multi-lsp-server "basedpyright_ruff")
 (setq lsp-bridge-markdown-lsp-server "marksman")
 (setq lsp-bridge-diagnostic-fetch-idle 0.05)
+(setq lsp-bridge-enable-search-words nil)
+(setq lsp-bridge-complete-manually t)
 (setq acm-backend-lsp-show-progress t)
+(setq acm-enable-search-file-words nil)
 
 (setq show-paren-delay 0)
 (setq eldoc-idle-delay 0.05)
@@ -751,8 +772,13 @@ Return nil if no consuming rule was found."
 
 (setq linum-format "%4d\u2502")
 (setq separators-regexp "\\([\-_'\\\"(){};:,.\\/?!@#%&*+=\n]\\|[[:space:]]\\|[][]\\)")
-(setq case-fold-search nil)
+(setq-default indent-tabs-mode nil)
 
+;; store all backup and autosave files in the tmp dir
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 ;; theme
 
@@ -793,7 +819,7 @@ Return nil if no consuming rule was found."
 (defun current-buffer-file-from-project (target_width)
   "extracts the path to the current file based on eglot project root"
   (let* ((filename (buffer-file-name))
-         (eglot-project (or (nth 2 (project-current))
+	 (eglot-project (or (nth 2 (project-current))
 			    (expand-file-name default-directory)))
 	 (processed-buffer-name
 	  (if (and filename (file-exists-p filename) eglot-project)
@@ -818,7 +844,7 @@ BUFFER defaults to the current buffer."
   (let ((fn (buffer-file-name (or buffer (current-buffer)))))
     (with-temp-buffer 
       (and (eq (vc-backend fn)
-           'Git)
+	   'Git)
        (eq (vc-git-command t 0 fn "branch" "--show-current") 0)
        (buffer-substring-no-properties (point-min) (line-end-position 0))))))
 
@@ -850,12 +876,12 @@ BUFFER defaults to the current buffer."
 
 (defun mode-line-renderer (left right filler_char)
   (let ((available-width
-         (- (window-total-width)
-            (+ (length (format-mode-line left))
-               (length (format-mode-line right))))))
+	 (- (window-total-width)
+	    (+ (length (format-mode-line left))
+	       (length (format-mode-line right))))))
     (concat left
-            (string-replace " " filler_char (format (format "%%%ds" available-width) ""))
-            right)))
+	    (string-replace " " filler_char (format (format "%%%ds" available-width) ""))
+	    right)))
 
 (setq-default mode-line-format
 	      '(
