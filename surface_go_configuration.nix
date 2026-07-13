@@ -48,6 +48,7 @@
     layout = "us";
     variant = "";
   };
+  services.xserver.updateDbusEnvironment = true;
 
   services.greetd = {
     enable = true;
@@ -170,4 +171,12 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
+  nixpkgs.overlays = [
+    (final: prev: {
+      # work around lutris - openldap trouble
+      openldap = prev.openldap.overrideAttrs (_: {
+        doCheck = false;
+      });
+    })
+  ];  
 }

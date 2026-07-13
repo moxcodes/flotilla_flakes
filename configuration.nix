@@ -78,6 +78,7 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  services.xserver.updateDbusEnvironment = true;
   services.xserver.videoDrivers = ["nvidia"];
   services.blueman.enable = true;
   hardware.graphics.enable = true;
@@ -86,7 +87,7 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.open = false;
   #  hardware.nvidia.prime.offload.enable = true;
@@ -219,4 +220,13 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.11"; # Did you read the comment?
+
+  nixpkgs.overlays = [
+    (final: prev: {
+      # work around lutris - openldap trouble
+      openldap = prev.openldap.overrideAttrs (_: {
+        doCheck = false;
+      });
+    })
+  ];
 }
