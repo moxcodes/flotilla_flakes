@@ -106,6 +106,7 @@
     libclang
     (callPackage ./deriv/bazel-lsp {})
     nil
+    nixd
     rust-analyzer
     clippy
     rustfmt

@@ -25,7 +25,7 @@
 		  "+\\)\\|[a-z0-9][A-Z]"
 		  )
 		 )))
-    (goto-char my-pos))
+    (goto-char (+ my-pos 1)))
   )
 )
 
@@ -619,7 +619,7 @@ Return nil if no consuming rule was found."
   :config
   ;; (add-to-list 'eglot-server-programs
   ;; 	       '(nix-mode . ("nil" "--stdio"))
-  (setq lsp-bridge-nix-lsp-server nil)
+  (setq lsp-bridge-nix-lsp-server "nixd")
   
   :hook
   (nix-mode . (lambda()

@@ -28,6 +28,7 @@
    `(default ((t (:background ,mox-bg1 :foreground ,mox-base))))
    `(cursor  ((t (:background ,mox-base :foreground ,mox-bg2))))
    `(hl-line ((t (:background ,mox-line-highlight))))
+   `(highlight ((t (:background ,mox-region-highlight))))
    `(modeline ((t (:background ,mox-bg1 :foreground ,mox-base))))
    `(mode-line-inactive ((t (:box nil :background ,mox-line-highlight :foreground ,mox-type))))
    `(mode-line ((t (:box nil :foreground ,mox-base :background ,mox-bg1))))
