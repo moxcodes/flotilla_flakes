@@ -45,7 +45,7 @@ in
   };
   home.packages = with pkgs; [
     age
-#    (callPackage aseprite {stdenv = pkgs.clangStdenv; })
+    aseprite #    (callPackage aseprite {stdenv = pkgs.clangStdenv; })
     android-tools
     waydroid
     waydroid-helper
