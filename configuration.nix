@@ -118,6 +118,8 @@
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   security.polkit.enable = true;
+  # not sure why this is default...
+  services.gnome.gcr-ssh-agent.enable = false;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
