@@ -64,6 +64,9 @@
     description = "jordan";
     extraGroups = ["docker" "networkmanager" "video" "wheel" "disk"];
     shell = pkgs.fish;
+    openssh.authorizedKeys.keyFiles = [
+      ./ssh/authorized_keys
+    ];
     packages = with pkgs; [];
   };
 
