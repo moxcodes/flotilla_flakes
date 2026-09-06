@@ -14,8 +14,8 @@
     in ''
       export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
       gnome_schema=org.gnome.desktop.interface
-      gsettings set $gnome_schema gtk-theme 'Plata-Noir'
-      gsettings set $gnome_schema icon-theme 'Paper'
+      gsettings set $gnome_schema gtk-theme 'Colloid-Green-Dark-Compact'
+      gsettings set $gnome_schema icon-theme 'Colloid'
       gsettings set $gnome_schema font-name 'InconsolataNerdFont 8'
       gsettings set $gnome_schema document-font-name 'InconsolataNerdFont 8'
       gsettings set $gnome_schema monospace-font-name 'InconsolataNerdFont 8'
@@ -70,9 +70,8 @@ in
     lutris
     mplayer
     obsidian
-    plata-theme
-    paper-gtk-theme
-    silver-searcher
+    (colloid-gtk-theme.override {themeVariants = ["green"]; sizeVariants = ["standard" "compact"]; tweaks = ["black" "rimless"]; })
+    silver-searcher-ng
     slurp
     sops
     steam
@@ -97,8 +96,8 @@ in
 
   gtk =
     let gtk_theme = {
-          package = pkgs.plata-theme;
-          name = "Plata-Noir";
+          package = pkgs.colloid-gtk-theme;
+          name = "Colloid-Green-Dark-Compact";
         };
     in
     {

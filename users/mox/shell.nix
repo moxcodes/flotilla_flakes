@@ -17,6 +17,7 @@
     csvkit
     csvlens
     dasel
+    ddrescue
     erdtree
     eza
     fd
