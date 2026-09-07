@@ -14,6 +14,8 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # optimization for faster boot when VPN is enabled
+  boot.initrd.systemd.network.wait-online.enable = false;  
 
   networking.hostName = "ares"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -58,6 +60,12 @@
     };
   };
 
+  systemd.services.tailscaled.serviceConfig.Environment = [
+    "TS_DEBUG_FIREWALL_MODE=nftables"
+  ];
+  systemd.network.wait-online.enable = false;
+
+  
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mox = {
     isNormalUser = true;
@@ -74,6 +82,7 @@
   security.rtkit.enable = true;
   security.polkit.enable = true;
   services.gnome.gcr-ssh-agent.enable = false;
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -156,17 +165,23 @@
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    # Syncthing ports (gui and sync protocol) - for mox
-    8384
-    22000
-  ];
-  networking.firewall.allowedUDPPorts = [
-    # Syncthing ports (sync protocol) - for mox
-    22000
-    21027
-  ];
+  services.tailscale.enable = true;
+  networking.nftables.enable = true;
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ config.services.tailscale.interfaceName ];
+    allowedTCPPorts = [
+      # Syncthing ports (gui and sync protocol) - for mox
+      8384
+      22000
+    ];
+    allowedUDPPorts = [
+      # Syncthing ports (sync protocol) - for mox
+      22000
+      21027
+      config.services.tailscale.port
+    ];
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -20,6 +20,8 @@
   security.protectKernelImage = false;
   boot.kernelParams = ["resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141"];
   boot.resumeDevice = "/dev/disk/by-uuid/3778fe96-f599-496a-b760-2c6bf7414141";
+  # optimization for faster boot when VPN is enabled
+  boot.initrd.systemd.network.wait-online.enable = false;  
   services.logind.settings.Login.HandleLidSwitch = "hibernate";
 
   networking.hostName = "rocinante"; # Define your hostname.
@@ -75,6 +77,11 @@
       User = "serviceuser";
     };
   };
+
+  systemd.services.tailscaled.serviceConfig.Environment = [
+    "TS_DEBUG_FIREWALL_MODE=nftables"
+  ];
+  systemd.network.wait-online.enable = false;
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -208,17 +215,23 @@
   virtualisation.docker.enable = true;
   virtualisation.waydroid.enable = true;
 
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    # Syncthing ports (gui and sync protocol) - for mox
-    8384
-    22000
-  ];
-  networking.firewall.allowedUDPPorts = [
-    # Syncthing ports (sync protocol) - for mox
-    22000
-    21027
-  ];
+  services.tailscale.enable = true;
+  networking.nftables.enable = true;
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ config.services.tailscale.interfaceName ];
+    allowedTCPPorts = [
+      # Syncthing ports (gui and sync protocol) - for mox
+      8384
+      22000
+    ];
+    allowedUDPPorts = [
+      # Syncthing ports (sync protocol) - for mox
+      22000
+      21027
+      config.services.tailscale.port
+    ];
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
