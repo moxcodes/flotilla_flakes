@@ -84,6 +84,7 @@ in
     xorg.xev
     xorg.libxcb
     wlr-randr
+    yt-dlp
     zathura
     zoom-us
     (callPackage ./deriv/multibg-sway {})
