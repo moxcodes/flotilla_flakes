@@ -110,6 +110,7 @@
     fish
     git
     glib
+    fuse3
     tuigreet
     gparted
     lm_sensors
@@ -118,6 +119,8 @@
     pciutils
     pv
     rustc
+    sshfs
+    sshfs-fuse
     sway
     upower
     xorg.xhost

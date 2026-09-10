@@ -177,6 +177,7 @@
     clang
     docker
     fish
+    fuse3
     git
     glib
     tuigreet
@@ -187,6 +188,8 @@
     pciutils
     pv
     rustc
+    sshfs
+    sshfs-fuse
     sway
     xorg.xhost
     wget
