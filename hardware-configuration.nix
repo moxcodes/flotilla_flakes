@@ -17,6 +17,12 @@
   boot.kernelModules = ["kvm-intel"];
   boot.extraModulePackages = [];
 
+  systemd.services."systemd-suspend" = {
+    serviceConfig = {
+      Environment = ''"SYSTEMD_SLEEP_FREEZE_USER_SESSIONS=false"'';
+    };
+  };
+
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/2d41aaef-d867-4284-9406-b6bff7f8d109";
     fsType = "btrfs";

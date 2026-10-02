@@ -18,7 +18,10 @@
 
   # required for hibernation
   security.protectKernelImage = false;
-  boot.kernelParams = ["resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141"];
+  boot.kernelParams = [
+    "resume=UUID=3778fe96-f599-496a-b760-2c6bf7414141"
+    "nvidia.NVreg_UsePageAttributeTable=1"
+  ];
   boot.resumeDevice = "/dev/disk/by-uuid/3778fe96-f599-496a-b760-2c6bf7414141";
   # optimization for faster boot when VPN is enabled
   boot.initrd.systemd.network.wait-online.enable = false;  
@@ -102,6 +105,8 @@
   hardware.nvidia.prime.sync.enable = true;
   hardware.nvidia.prime.nvidiaBusId = "PCI:1:0:0";
   hardware.nvidia.prime.intelBusId = "PCI:0:2:0";
+  hardware.nvidia.powerManagement.enable = true;
+  hardware.nvidia.powerManagement.finegrained = false;
   hardware.nvidia.forceFullCompositionPipeline = true;
 
   # Enable the XFCE Desktop Environment.
