@@ -77,6 +77,8 @@ in
     steam
     syncthing
     texlive.combined.scheme-full
+    thunar
+    vlc
     waybar
     wl-clipboard
     xdg-utils

@@ -404,23 +404,23 @@
 	  (124 . orderless-regexp)))
   )
 
-(use-package 'yasnippet
+(use-package yasnippet
   :ensure t
   :init
   (yas-global-mode 1)
   )
 
-(use-package 'lsp-bridge
+(use-package lsp-bridge
   :ensure t
   :after yasnippet
   :init
   (global-lsp-bridge-mode)
   )
 
-(use-package 'popon
+(use-package popon
   :ensure t)
 
-(use-package 'acm-terminal
+(use-package acm-terminal
   :ensure t)
 
 (unless (display-graphic-p)
