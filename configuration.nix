@@ -219,6 +219,13 @@
   # Enable the OpenSSH daemon.
   programs.ssh.startAgent = true;
   services.openssh.enable = true;
+  programs.fuse.userAllowOther = true;
+  security.wrappers.fusermount3 = {
+    owner = "root";
+    group = "root";
+    setuid = true;
+    source = "${pkgs.fuse3}/bin/fusermount3";
+  };  
   services.openssh.settings.PasswordAuthentication = false;
   virtualisation.docker.enable = true;
   virtualisation.waydroid.enable = true;
