@@ -32,7 +32,7 @@
             {
               home_manager_path = home-manager.outPath;
               sysname = "rocinante";
-              meta_conf = (import ./customizations.nix).laptop_size;
+              meta_conf = (import ./customizations.nix).laptop;
             })
         ];
       };
@@ -44,8 +44,21 @@
             {
               home_manager_path = home-manager.outPath;
               sysname = "ares";
-              meta_conf = (import ./customizations.nix).tablet_size;
+              meta_conf = (import ./customizations.nix).tablet;
             })
+        ];
+      };
+      wayfarer = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./wayfarer_configuration.nix
+          (import ./users
+            {
+              home_manager_path = home-manager.outPath;
+              systname = "wayfarer";
+              meta_conf = (import ./customizations.nix).desktop;
+            }
+          )
         ];
       };
     };
