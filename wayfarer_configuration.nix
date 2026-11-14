@@ -18,20 +18,25 @@
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sda";
 
-  # networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "wayfarer";
 
   # Configure network connections interactively with nmcli or nmtui.
   networking.networkmanager.enable = true;
 
+  systemd.services.tailscaled.serviceConfig.Environment = [
+    "TS_DEBUG_FIREWALL_MODE=nftables"
+  ];
+  systemd.network.wait-online.enable = false;
+
   # Set your time zone.
-  # time.timeZone = "Europe/Amsterdam";
+  time.timeZone = "America/Los_Angeles";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
+  i18n.defaultLocale = "en_US.UTF-8";
   # console = {
   #   font = "Lat2-Terminus16";
   #   keyMap = "us";
@@ -39,20 +44,30 @@
   # };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-
-  # Enable the GNOME Desktop Environment.
-  # services.displayManager.gdm.enable = true;
-  # services.desktopManager.gnome.enable = true;
-  
-
-  # Configure keymap in X11
-  services.xserver.xkb.layout = "us";
-  # services.xserver.xkb.options = "eurosign:e,caps:escape";
+  services.xserver.enable = false;
 
   # Enable CUPS to print documents.
-  # services.printing.enable = true;
+  services.printing.enable = true;
+
+  hardware.graphics.enable = true;
+  hardware.graphics.enable32Bit = true;
+
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+
+  hardware.nvidia.open = true;
+
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  security.polkit.enable = true;
+
+  services.gnome.gcr-ssh-agent.enable = false;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
 
   # Enable sound.
   # services.pulseaudio.enable = true;
@@ -67,39 +82,85 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mox = {
-     isNormalUser = true;
-     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-     shell = pkgs.bash;
-     home = "/home/mox";
+    isNormalUser = true;
+    description = "Jordan Moxon";
+    extraGroups = ["docker" "networkmanager" "video" "wheel" "disk"];
+    openssh.authorizedKeys.keyFiles = [
+      ./ssh/authorized_keys
+    ];
+    shell = pkgs.fish;
    };
 
-  # programs.firefox.enable = true;
+  nix.package = pkgs.nixVersions.latest;
+  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.auto-optimise-store = true;
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.nvidia.acceptLicense = true;
+  # nixpkgs.config.cudaSupport = true;
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
-    emacs
+    cargo
+    clang
+    docker
+    fish
+    fuse3
+    git
+    glib
+    tuigreet
+    gparted
+    lm_sensors
+    lshw
+    ntfs3g
+    pciutils
+    pv
+    rustc
+    sshfs
+    sshfs-fuse
+    sway
     wget
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  fonts.packages = with pkgs; [
+    nerd-fonts.inconsolata
+    nerd-fonts.symbols-only
+  ];
 
-  # List services that you want to enable:
+  programs.fish.enable = true;
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+  programs.ssh.startAgent = true;
+  services.openssh.enable = true;
+  programs.fuse.userAllowOther = true;
+  security.wrappers.fusermount3 = {
+    owner = "root";
+    group = "root";
+    setuid = true;
+    source = "${pkgs.fuse3}/bin/fusermount3";
+  };  
+  services.openssh.settings.PasswordAuthentication = false;
+  virtualisation.docker.enable = true;
+  virtualisation.waydroid.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  services.tailscale.enable = true;
+  networking.nftables.enable = true;
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ config.services.tailscale.interfaceName ];
+    allowedTCPPorts = [
+      # Syncthing ports (gui and sync protocol) - for mox
+      8384
+      22000
+    ];
+    allowedUDPPorts = [
+      # Syncthing ports (sync protocol) - for mox
+      22000
+      21027
+      config.services.tailscale.port
+    ];
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
@@ -126,4 +187,3 @@
   system.stateVersion = "26.05"; # Did you read the comment?
 
 }
-
