@@ -66,7 +66,7 @@ in
     nerd-fonts.inconsolata
     nerd-fonts.symbols-only
     kitty
-    krita
+#    krita
     lutris
     mplayer
     obsidian

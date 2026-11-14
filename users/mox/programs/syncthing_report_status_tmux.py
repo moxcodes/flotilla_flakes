@@ -9,7 +9,7 @@ def get_syncthing_rest_response(url, path, key):
   return response
 
 # TODO: fix...
-api_key = "gwAqXYNRA52NiWeKMepcFLA9Fs2oP53r"
+api_key = ""
 local_syncthing_url = "127.0.0.1:8384"
 
 try:
