@@ -30,7 +30,7 @@ in
     # personal config factoring
     ((import ./backend_dev_edc.nix {custom = meta_conf; }) args)
     ((import ./shell.nix {custom = meta_conf; }) args)
-  ] ++ lib.optionals !meta_conf.headless [
+  ] ++ lib.optionals (!meta_conf.headless) [
     ((import ./coms.nix {custom = meta_conf; }) args)
     ((import ./media.nix {custom = meta_conf; }) args)
     ((import ./graphical.nix {custom = meta_conf; }) args)

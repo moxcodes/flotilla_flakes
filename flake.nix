@@ -55,7 +55,7 @@
           (import ./users
             {
               home_manager_path = home-manager.outPath;
-              systname = "wayfarer";
+              sysname = "wayfarer";
               meta_conf = (import ./customizations.nix).desktop;
             }
           )
