@@ -11,15 +11,8 @@
   home.packages = with pkgs; [
     ast-grep
     bat
-    bazel-buildtools
     bitwarden-cli
     browsh
-    csvkit
-    csvlens
-    dasel
-    ddrescue
-    erdtree
-    eza
     fd
     figlet
     file
@@ -27,22 +20,14 @@
     font-awesome
     fzf
     gnumake
-    hck
-    hyperfine
-    ictree
     ispell
-    nap
     nerd-fonts.inconsolata
     nerd-fonts.symbols-only
-    plocate
     progress
     pv
-    reflex
     ripgrep
     tealdeer
     tre-command
-    sad
-    viddy
     z-lua
     # hardware
     brightnessctl
@@ -57,12 +42,60 @@
     kickstart
     # media
     asciinema
-    # web
-    httpie
-    # communication
-    mutt
     # terminal emulation
     tmux
+    # data munging
+    jid
+    jq
+    pup
+    yq
+    # networking
+    bluetuith
+    gping
+    netscanner
+    oha
+    termshark
+    
+    libclang
+    nil
+    nixd
+    rust-analyzer
+    clippy
+    rustfmt
+    go-jsonnet
+    gopls
+    marksman
+    basedpyright
+    ruff
+    pyright
+    protols
+    vscode-langservers-extracted
+    typescript-language-server
+    bash-language-server
+  ] ++ lib.optionals (custom.resources == "large") [
+    bazel-buildtools
+    csvkit
+    csvlens
+    dasel
+    ddrescue
+    erdtree
+    eza
+    hck
+    hyperfine
+    ictree
+    nap
+    plocate
+    reflex
+    sad
+    viddy
+    # communication
+    mutt
+    # cluster management
+    cloudlens
+    k9s
+    kubectx
+    # web
+    httpie
     # file management
     bupstash
     extundelete
@@ -80,50 +113,20 @@
     fastfetch
     procs
     sysz
+
     # containers
     dive
     oxker
-    # cluster management
-    cloudlens
-    k9s
-    kubectx
-    # data munging
-    jid
-    jq
-    pup
-    yq
-    # networking
-    bluetuith
-    gping
-    netscanner
-    oha
-    termshark
+
     # reversing
     binsider
     blink
     hexyl
-    
-    # Spacemacs refugees -- TODO move around to separate package
-    libclang
+
     (callPackage ./deriv/bazel-lsp {})
-    nil
-    nixd
-    rust-analyzer
-    clippy
-    rustfmt
     (callPackage ./deriv/rjsonnet {})
-    go-jsonnet
-    gopls
     metals
-    marksman
-    basedpyright
-    ruff
     jdt-language-server
-    pyright
-    protols
-    vscode-langservers-extracted
-    typescript-language-server
-    bash-language-server
     kotlin-language-server
     texlab
     vale-ls
@@ -134,7 +137,7 @@
     wasm-language-tools
     yaml-language-server
     lemminx
-    haskell-language-server
+    haskell-language-server    
   ];
   programs.delta = {
     enable = true;

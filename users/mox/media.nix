@@ -10,7 +10,6 @@
     cmusfm
     mplayer
     newsraft
-    pianobar
     timg
  ];
 }
