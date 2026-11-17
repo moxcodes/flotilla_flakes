@@ -1,9 +1,8 @@
-{meta_conf}: {
+{custom}: {
   config,
   pkgs,
-  lib,
   ...
-}@args: let
+}: let
   configure-gtk = pkgs.writeTextFile {
     name = "configure-gtk";
     destination = "/bin/configure-gtk";
@@ -24,21 +23,10 @@
 in
 {
   imports = [
-    # program modules/extensions
-    ./modules/python_manager.nix
-
-    # personal config factoring
-    ((import ./backend_dev_edc.nix {custom = meta_conf; }) args)
-    ((import ./coms.nix {custom = meta_conf; }) args)
-    ((import ./shell.nix {custom = meta_conf; }) args)    
-    ((import ./media.nix {custom = meta_conf; }) args)
   ];
 
   home.packages = with pkgs; [
     aseprite #    (callPackage aseprite {stdenv = pkgs.clangStdenv; })
-    android-tools
-    waydroid
-    waydroid-helper
     bemenu
     chromedriver
     configure-gtk
@@ -48,17 +36,12 @@ in
     feh
     firefox-bin
     mesa-demos
-    gimp
     grim
     kitty
 #    krita
-    lutris
-    obsidian
     (colloid-gtk-theme.override {themeVariants = ["green"]; sizeVariants = ["standard" "compact"]; tweaks = ["black" "rimless"]; })
     slurp
-    sops
     steam
-    texlive.combined.scheme-full
     thunar
     vlc
     waybar
@@ -71,6 +54,15 @@ in
     zathura
     zoom-us
     (callPackage ./deriv/multibg-sway {})
+  ] ++ lib.optionals (custom.resources == "large") [
+    android-tools
+    waydroid
+    waydroid-helper
+    gimp
+    lutris
+    obsidian
+    sops
+    texlive.combined.scheme-full
   ];
 
   gtk =
@@ -91,7 +83,7 @@ in
         name = "Paper";
       };
       font.name = "InconsolataNerdFont";
-      font.size = meta_conf.fontsize;
+      font.size = custom.fontsize;
     };
 
   # programs.firefox = {
@@ -106,7 +98,7 @@ in
     enable = true;
     font = {
       name = "InconsolataNerdFont";
-      size = meta_conf.fontsize + 0.0;
+      size = custom.fontsize + 0.0;
     };
     settings = {
       cursor = "#00DD00";
@@ -463,7 +455,7 @@ in
       };
       fonts = {
         names = ["InconsolataNerdFont"];
-        size = meta_conf.fontsize + 0.0;
+        size = custom.fontsize + 0.0;
       };
       bars = [
         {

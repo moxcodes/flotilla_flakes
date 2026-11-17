@@ -31,11 +31,7 @@
 
   fileSystems."/mnt/media" = {
     device = "/dev/mmcblk0p1";
-    fsType = "exfat";
-    options = [
-      "uid=1000"
-      "gid=1000"
-    ];
+    fsType = "btrfs";
   };
 
   swapDevices = [];
