@@ -8,7 +8,6 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.systemd.enable = true;
   boot.initrd.services.swraid = {
     enable = true;
     mdadmConf = ''
@@ -24,12 +23,18 @@
     { device = "/dev/disk/by-uuid/e8b14a6f-8522-43e5-85ff-f14f695aca59";
       fsType = "btrfs";
     };
-
+  
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/118A-484C";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
+
+  fileSystems."/boot-copy" = {
+    device = "/dev/disk/by-uuid/1149-054A";
+    fsType = "vfat";
+    options = [ "fmask=0022" "dmask=0022" ];
+  };
 
   swapDevices = [
     {
