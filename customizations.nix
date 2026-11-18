@@ -17,4 +17,10 @@
    resources = "large";
    headless = true;
  };
+ bebop = {
+   fontsize = 12.0;
+   email = "jordan@mox.codes";
+   resources = "large";
+   headless = false;
+ };
 }

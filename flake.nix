@@ -61,6 +61,19 @@
           )
         ];
       };
+      bebop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./bebop_configuration.nix
+          (import ./users
+            {
+              home_manager_path = home-manager.outPath;
+              sysname = "bebop";
+              meta_conf = (import ./customizations.nix).bebop;
+            }
+          )
+        ];
+      };
     };
     # TODO there's some clever usage of forAllSystems that's supposed to make this
     # easier, but I haven't gotten that to work yet so hack hack hack
