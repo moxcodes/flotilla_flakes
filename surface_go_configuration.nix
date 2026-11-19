@@ -173,8 +173,6 @@
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
-  virtualisation.docker.enable = true;
-  virtualisation.waydroid.enable = true;
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
