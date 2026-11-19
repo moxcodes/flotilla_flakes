@@ -124,6 +124,7 @@
     sway
     upower
     xorg.xhost
+    vim
     wget
   ];
   services.thermald.enable = true;

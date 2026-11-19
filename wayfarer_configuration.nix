@@ -121,6 +121,7 @@
     sshfs
     sshfs-fuse
     sway
+    vim
     wget
   ];
 

@@ -191,6 +191,7 @@
     sshfs-fuse
     sway
     xorg.xhost
+    vim
     wget
   ];
 
