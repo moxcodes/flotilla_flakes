@@ -27,13 +27,37 @@
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/118A-484C";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      options = [ "fmask=0022" "dmask=0022" "nofail"];
     };
 
   fileSystems."/boot-copy" = {
     device = "/dev/disk/by-uuid/1149-054A";
     fsType = "vfat";
-    options = [ "fmask=0022" "dmask=0022" ];
+    options = [ "fmask=0022" "dmask=0022" "nofail"];
+  };
+
+  fileSystems."/store" = {
+    device = "/dev/disk/by-uuid/4886abf7-ef0f-419c-9182-63ee0050b1f3";
+    fsType = "btrfs";
+    options = [ "nofail" ];
+  };
+
+  fileSystems."/extra-store" = {
+    device = "/dev/disk/by-uuid/d47a4c12-8db8-4b5a-8342-5059afa811d5";
+    fsType = "btrfs";
+    options = [ "nofail" ];
+  };
+
+  fileSystems."/backup-store" = {
+    device = "/dev/disk/by-uuid/14ACA7A0ACA77ABE";
+    fsType = "ntfs";
+    options = [ "nofail" ];
+  };
+
+  fileSystems."/external-backup-store" = {
+    device = "/dev/disk/by-uuid/83320c28-1f98-4db7-935d-4fa36dd6c9eb";
+    fsType = "btrfs";
+    options = [ "nofail" "x-systemd.automount" ];
   };
 
   swapDevices = [
