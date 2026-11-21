@@ -145,20 +145,18 @@
   virtualisation.docker.enable = true;
   virtualisation.waydroid.enable = true;
 
+  services.syncthing = {
+    enable = true;
+    openDefaultPorts = true;
+  };
+  
   services.tailscale.enable = true;
   networking.nftables.enable = true;
   networking.firewall = {
     enable = true;
     trustedInterfaces = [ config.services.tailscale.interfaceName ];
-    allowedTCPPorts = [
-      # Syncthing ports (gui and sync protocol) - for mox
-      8384
-      22000
-    ];
+    allowedTCPPorts = [];
     allowedUDPPorts = [
-      # Syncthing ports (sync protocol) - for mox
-      22000
-      21027
       config.services.tailscale.port
     ];
   };
