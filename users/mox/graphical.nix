@@ -462,14 +462,7 @@ in
           command = "waybar";
         }
       ];
-      output = {
-        "eDP-1" = {
-          bg = "~/.config/sway/wallpapers/eDP-1/_default.png fill";
-          pos = "0 0";
-          res = "1920x1080";
-          scale = "1.0";
-        };
-      };
+      output = custom.monitor_output;
       terminal = "kitty";
       startup = [];
     };
